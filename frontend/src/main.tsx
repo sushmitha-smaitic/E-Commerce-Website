@@ -12,6 +12,7 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import App from './App.tsx';
+import { StoreProvider } from './Store.tsx';
 import './index.css';
 import HomePage from './pages/HomePage.tsx';
 import ProductPage from './pages/ProductPage.tsx';
@@ -30,11 +31,13 @@ const router = createBrowserRouter(
 const queryClient = new QueryClient()
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <StoreProvider>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={false}/>
      </QueryClientProvider>
     </HelmetProvider>
+    </StoreProvider>
   </React.StrictMode>,
 )

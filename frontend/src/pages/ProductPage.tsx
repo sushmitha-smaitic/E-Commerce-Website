@@ -84,6 +84,7 @@ export default function ProductPage() {
           </Card>
         </Col>
       </Row>
-    </div>)
+    </div>
   )
+)
 }
