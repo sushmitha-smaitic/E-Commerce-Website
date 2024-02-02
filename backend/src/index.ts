@@ -1,6 +1,23 @@
 import cors from "cors";
-import express, { Request, Response } from "express";
-import { sampleProducts } from "./data";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import { productRouter } from "./router/productRouter";
+import { seedRouter } from "./router/seedRouter";
+
+dotenv.config();
+
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost/IndianBazaardb";
+mongoose.set("strictQuery", true);
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log("connected to mongodb");
+  })
+  .catch(() => {
+    console.log("error mongodb");
+  });
 const app = express();
 app.use(
   cors({
@@ -16,13 +33,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/api/products", (req: Request, res: Response) => {
-  res.json(sampleProducts);
-});
-
-app.get(`/api/products/:slug`, (req: Request, res: Response) => {
-  res.json(sampleProducts.find((x) => x.slug === req.params.slug));
-});
+app.use("/api/products", productRouter);
+app.use("/api/seed", seedRouter);
 
 const PORT = 4000;
 app.listen(PORT, () => {
