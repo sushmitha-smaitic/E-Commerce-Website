@@ -1,0 +1,8 @@
+{
+    "mongo": {
+        "dbname": "IndianBazaar",
+        "username": "IndianBazaarUser",
+        "password": "userpassword",
+        "connectionUrl": "mongodb+srv://IndianBazaarUser:userpassword@cluster0.mg5upzj.mongodb.net/IndianBazaar?retryWrites=true&w=majority"
+    }
+}
