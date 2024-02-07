@@ -4,6 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import { productRouter } from "./router/productRouter";
 import { seedRouter } from "./router/seedRouter";
+import { userRouter } from "./router/userRouter";
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ app.use(
   })
 );
 
+app.use(express.json);
+app.use(express.urlencoded({ extended: true }));
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
@@ -34,6 +38,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/products", productRouter);
+app.use("/api/users", userRouter);
 app.use("/api/seed", seedRouter);
 
 const PORT = 4000;
