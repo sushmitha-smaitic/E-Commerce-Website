@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Store } from "../Store";
 import MessageBox from "../components/MessageBox";
-import { cartItem } from "../types/Cart";
+import { cartItem } from '../types/Cart';
 
 export default function CartPage(){
     const navigate = useNavigate()
@@ -31,6 +31,10 @@ export default function CartPage(){
 
     const checkoutHandler=()=>{
         navigate('/signin?redirect=/shipping')
+    }
+
+    const removeItemHandler=(item: cartItem)=>{
+        dispatch({type:'CART_REMOVE_ITEM', payload: item})
     }
     return(
         <div>
@@ -62,9 +66,9 @@ export default function CartPage(){
                                                 <i className="fas fa-plus-circle"></i>
                                             </Button>
                                         </Col>
-                                        <Col md={3}>${item.price}</Col>
+                                        <Col md={3}><span>&#8377;</span>{item.price}</Col>
                                         <Col md={2}>
-                                            <Button variant={mode}>
+                                            <Button onClick={()=>removeItemHandler(item)} variant={mode}>
                                                 <i className="fas fa-trash"></i>
                                             </Button>
                                         </Col>
