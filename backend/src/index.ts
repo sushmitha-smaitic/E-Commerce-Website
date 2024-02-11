@@ -20,12 +20,17 @@ mongoose
     console.log("error mongodb");
   });
 const app = express();
-app.use(
-  cors({
-    credentials: true,
-    origin: ["http://localhost:5173"],
-  })
-);
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: ["http://localhost:5173"],
+//   })
+// );
+const corsOptions = {
+  origin: "http://127.0.0.1:5173",
+  credentials: true, //access-control-allow-credentials:true
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

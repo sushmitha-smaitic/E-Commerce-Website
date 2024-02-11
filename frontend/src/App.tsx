@@ -38,7 +38,7 @@ function App() {
             <i className={mode==='light'?'fa fa-sun':'fa fa-moon'}></i>
           </Button>
           <Link to='/cart' className='nav-link'>
-            Cart{
+          Cart{
               cart.cartItems.length>0 && (
                 <Badge pill bg="danger">
                   {cart.cartItems.reduce((a,c)=>a+c.quantity,0)}

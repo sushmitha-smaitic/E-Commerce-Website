@@ -2,9 +2,9 @@ import { useContext } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Product } from '../../../backend/src/types/Product';
 import { Store } from '../Store';
 import { cartItem } from '../types/Cart';
+import { Product } from '../types/Product';
 import { convertProductToCartItem } from '../utils';
 import Rating from './Rating';
 function ProductItem({product}:{product: Product}){
