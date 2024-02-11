@@ -72,6 +72,9 @@ export default function ProductPage() {
             <ListGroup.Item>
               Description:<p>{product.description}</p>
             </ListGroup.Item>
+            <ListGroup.Item className="discount">
+              Discount:<p>{product.discount}<span>&#37;</span></p>
+            </ListGroup.Item>
           </ListGroup>
         </Col>
         <Col md={3}>

@@ -10,4 +10,5 @@ export type Product = {
   description: string;
   rating: number;
   numReviews: number;
+  discount: number;
 };
