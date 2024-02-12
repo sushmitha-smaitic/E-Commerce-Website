@@ -20,5 +20,8 @@ export class ProductController {
     });
   };
 
-  constructor() {}
+  constructor() {
+    this.getProducts;
+    this.getProduct;
+  }
 }
