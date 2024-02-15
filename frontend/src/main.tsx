@@ -13,10 +13,12 @@ import {
 } from "react-router-dom";
 import App from './App.tsx';
 import { StoreProvider } from './Store.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 import './index.css';
 import CartPage from './pages/CartPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import PaymentMethodPage from './pages/PaymentMethodPage.tsx';
+import PlaceOrderPage from './pages/PlaceOrder.tsx';
 import ProductPage from './pages/ProductPage.tsx';
 import ShippingAddressPage from './pages/ShippingAddressPage.tsx';
 import SignInPage from './pages/SignInPage.tsx';
@@ -31,8 +33,11 @@ const router = createBrowserRouter(
       <Route path="/cart" element={<CartPage/>}/>
       <Route path="/signin" element={<SignInPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>
-      <Route path='/shipping' element={<ShippingAddressPage/>}/>
-      <Route path='/payment' element={<PaymentMethodPage/>}/>
+      <Route path='' element={<ProtectedRoute/>}>
+        <Route path='/shipping' element={<ShippingAddressPage/>}/>
+        <Route path='/payment' element={<PaymentMethodPage/>}/>
+        <Route path='/placeorder' element={<PlaceOrderPage/>}/>
+      </Route>
       {/* <Route path="dashboard" element={<Dashboard />} /> */}
       {/* ... etc. */}
     </Route>

@@ -2,6 +2,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import { orderRouter } from "./router/orderRouter";
 import { productRouter } from "./router/productRouter";
 import { seedRouter } from "./router/seedRouter";
 import { userRouter } from "./router/userRouter";
@@ -35,6 +36,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// const bodyParser = require("body-parser");
+
+// app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
@@ -44,6 +49,7 @@ app.use((req, res, next) => {
 
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
+app.use("/api/orders", orderRouter);
 app.use("/api/seed", seedRouter);
 
 const PORT = 4000;
