@@ -15,6 +15,7 @@ export const sampleProducts: Product[] = [
     numReviews: 10,
     description: "high quality shirt",
     discount: 12,
+    maxQuantity: 5,
   },
   {
     name: "Adidas Fit Shirt",
@@ -28,6 +29,7 @@ export const sampleProducts: Product[] = [
     numReviews: 6,
     description: "high quality shirt",
     discount: 10,
+    maxQuantity: 7,
   },
   {
     name: "Lacoste Free Pants",
@@ -41,6 +43,7 @@ export const sampleProducts: Product[] = [
     numReviews: 32,
     description: "high quality pant",
     discount: 15,
+    maxQuantity: 21,
   },
   {
     name: "Nike Slim Pant",
@@ -54,6 +57,7 @@ export const sampleProducts: Product[] = [
     numReviews: 9,
     description: "high quality shirt",
     discount: 12,
+    maxQuantity: 12,
   },
 ];
 

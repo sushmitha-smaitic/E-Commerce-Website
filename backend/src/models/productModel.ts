@@ -36,6 +36,9 @@ export class Product {
 
   @prop({ required: true, default: 0 })
   public discount!: number;
+
+  @prop({ required: true, default: 0 })
+  public maxQuantity!: number;
 }
 
 export const ProductModel = getModelForClass(Product);

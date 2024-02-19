@@ -11,4 +11,5 @@ export type Product = {
   rating: number;
   numReviews: number;
   discount: number;
+  maxQuantity: number;
 };
