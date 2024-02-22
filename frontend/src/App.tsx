@@ -42,8 +42,8 @@ function App() {
   }
 
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false)
-
   const { data: categories, isLoading, error } = useGetCategoriesQuery()
+
 
   return (
     <div className="d-flex flex-column vh-100">
@@ -99,6 +99,22 @@ function App() {
                   <NavDropdown className="header-link" title={`Hello, sign in`}>
                     <LinkContainer to="/signin">
                       <NavDropdown.Item>Sign In</NavDropdown.Item>
+                    </LinkContainer>
+                  </NavDropdown>
+                )}
+                {userInfo && userInfo.isAdmin && (
+                  <NavDropdown className="header-link" title="Admin" id='admin-nav-dropdown'>
+                    <LinkContainer to='/admin/dashboard'>
+                      <NavDropdown.Item>Dashboard</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to='/admin/products'>
+                      <NavDropdown.Item>Products</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to='/admin/orders'>
+                      <NavDropdown.Item>Orders</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to='/admin/users'>
+                      <NavDropdown.Item>Users</NavDropdown.Item>
                     </LinkContainer>
                   </NavDropdown>
                 )}
@@ -183,7 +199,7 @@ function App() {
               </Button>
             </div>
           </ListGroup.Item>
-          {isLoading ? (
+         {isLoading ? (
             <LoadingBox />
           ) : error ? (
             <MessageBox variant="danger">
@@ -198,9 +214,9 @@ function App() {
                 >
                   <Nav.Link>{category}</Nav.Link>
                 </LinkContainer>
-              </ListGroup.Item>
+              </ListGroup.Item> 
             ))
-          )}
+            )} 
         </ListGroup>
       </div>
 

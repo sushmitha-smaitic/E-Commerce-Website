@@ -9,6 +9,12 @@ export const useGetOrderDetailsQuery = (id: string) =>
     queryFn: async () => (await apiClient.get<Order>(`api/orders/${id}`)).data,
   });
 
+export const useGetOrdersQuery = () =>
+  useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => (await apiClient.get<Order[]>(`api/orders`)).data,
+  });
+
 export const useGetOrderHistoryQuery = () =>
   useQuery({
     queryKey: ["order-history"],
@@ -49,6 +55,17 @@ export const useCreateOrderMutation = () =>
         await apiClient.post<{ message: string; order: Order }>(
           `api/orders`,
           order
+        )
+      ).data,
+  });
+
+export const useDeliveredOrderMutation = () =>
+  useMutation({
+    mutationFn: async (details: { orderId: string }) =>
+      (
+        await apiClient.put<{ message: string; order: Order }>(
+          `api/orders/${details.orderId}`,
+          details
         )
       ).data,
   });

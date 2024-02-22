@@ -25,9 +25,13 @@ import PaymentMethodPage from './pages/PaymentMethodPage.tsx';
 import PlaceOrderPage from './pages/PlaceOrder.tsx';
 import ProductPage from './pages/ProductPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
+import SearchPage from './pages/SearchPage.tsx';
 import ShippingAddressPage from './pages/ShippingAddressPage.tsx';
 import SignInPage from './pages/SignInPage.tsx';
 import SignupPage from './pages/SignUpPage';
+import DashboardPage from './pages/admin/DashboardPage.tsx';
+import OrderListPage from './pages/admin/OrderListPage.tsx';
+import ProductListPage from './pages/admin/ProductListPage.tsx';
 
 
 const router = createBrowserRouter(
@@ -37,6 +41,7 @@ const router = createBrowserRouter(
       <Route path="product/:slug" element={<ProductPage/>}/>
       <Route path="/cart" element={<CartPage/>}/>
       <Route path="/signin" element={<SignInPage/>}/>
+      <Route path="/search" element={<SearchPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>
       <Route path='' element={<ProtectedRoute/>}>
         <Route path='/admin' element={<AdminRoute/>}/>
@@ -47,6 +52,12 @@ const router = createBrowserRouter(
         <Route path='/orderhistory' element={<OrderHistoryPage/>}/>
         <Route path="/profile" element={<ProfilePage/>} />
 
+      </Route>
+
+      <Route path='' element={<AdminRoute/>}>
+        <Route path='/admin/orders' element={<OrderListPage/>}/>
+        <Route path='/admin/dashboard' element={<DashboardPage/>}/>
+        <Route path='/admin/products' element={<ProductListPage/>}/>
       </Route>
       {/* <Route path="dashboard" element={<Dashboard />} /> */}
       {/* ... etc. */}

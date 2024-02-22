@@ -4,7 +4,7 @@ import { UserInfo } from "./types/UserInfo";
 type AppState = {
   mode: string;
   cart: Cart;
-  userInfo?: UserInfo
+  userInfo?: UserInfo;
 };
 
 const initialState: AppState = {

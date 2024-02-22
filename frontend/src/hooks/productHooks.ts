@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import apiClient from "../apiClient";
 import { Product } from "../types/Product";
 
@@ -20,4 +20,28 @@ export const useGetCategoriesQuery = () =>
     queryKey: ["categories"],
     queryFn: async () =>
       (await apiClient.get<[]>(`/api/products/categories`)).data,
+  });
+
+export const useCreateProductMutation = () =>
+  useMutation({
+    mutationFn: async (product: {
+      _id: string;
+      name: string;
+      slug: string;
+      image: string;
+      category: string;
+      brand: string;
+      price: number;
+      countInStock: number;
+      description: string;
+      rating: number;
+      numReviews: number;
+      discount: number;
+    }) =>
+      (
+        await apiClient.post<{ message: string; product: Product }>(
+          `/api/products`,
+          product
+        )
+      ).data,
   });

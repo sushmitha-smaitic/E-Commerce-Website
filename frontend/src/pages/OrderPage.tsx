@@ -1,5 +1,5 @@
 import {
-    PayPalButtons, PayPalButtonsComponentProps, SCRIPT_LOADING_STATE, usePayPalScriptReducer
+  PayPalButtons, PayPalButtonsComponentProps, SCRIPT_LOADING_STATE, usePayPalScriptReducer
 } from '@paypal/react-paypal-js'
 import { useContext, useEffect } from 'react'
 import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap'
@@ -10,7 +10,8 @@ import { Store } from '../Store'
 import LoadingBox from '../components/LoadingBox'
 import MessageBox from '../components/MessageBox'
 import {
-    useGetOrderDetailsQuery, useGetPaypalClientIdQuery, usePayOrderMutation
+  //useDeliveredOrderMutation,
+  useGetOrderDetailsQuery, useGetPaypalClientIdQuery, usePayOrderMutation
 } from '../hooks/orderHooks'
 import { ApiError } from '../types/ApiError'
 import { getError } from '../utils'
@@ -21,6 +22,8 @@ import { getError } from '../utils'
   
     const params = useParams()
     const { id: orderId } = params
+
+    
   
     const {
       data: order,
@@ -30,6 +33,7 @@ import { getError } from '../utils'
     } = useGetOrderDetailsQuery(orderId!)
   
     const { mutateAsync: payOrder, isPending: loadingPay } = usePayOrderMutation()
+    //const {mutateAsync: deliverOrder, isPending:loadingDelivered }=useDeliveredOrderMutation()
   
     const testPayHandler = async () => {
       await payOrder({ orderId: orderId! })
@@ -92,6 +96,20 @@ import { getError } from '../utils'
         toast.error(getError(err as ApiError))
       },
     }
+
+    // const deliverOrderHandler=async()=>{
+    //   if (!orderId) {
+    //     toast.error('orderId is undefined')
+    //     return;
+    //   }
+    //   try{
+    //     await deliverOrder({orderId});
+    //     refetch();
+    //     toast.success('Order Delivered')
+    //   }catch(err){
+    //     getError(err as unknown as ApiError)
+    //   }
+    // }
   
     return isPending ? (
       <LoadingBox></LoadingBox>
@@ -220,6 +238,13 @@ import { getError } from '../utils'
                       {loadingPay && <LoadingBox></LoadingBox>}
                     </ListGroup.Item>
                   )}
+
+                  {/* {loadingDelivered && <LoadingBox/>}
+                  {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered &&(
+                    <ListGroup.Item>
+                      <Button type='button' className='btn btn-block' onClick={deliverOrderHandler}>Mark as Delivered</Button>
+                    </ListGroup.Item>
+                  )} */}
                 </ListGroup>
               </Card.Body>
             </Card>
