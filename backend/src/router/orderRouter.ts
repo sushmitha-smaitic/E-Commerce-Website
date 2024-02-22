@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { Order, OrderModel } from "../models/orderModel";
 import { Product } from "../models/productModel";
-import { isAuth } from "../utils";
+import { isAdmin, isAuth } from "../utils";
 
 export const orderRouter = express.Router();
 
@@ -15,10 +15,10 @@ orderRouter.get(
   })
 );
 
-// orderRouter.get("/", isAuth, async (req, res) => {
-//   const orders = await OrderModel.find({}).populate('user');
-//   res.send(orders);
-// });
+orderRouter.get("/", isAuth, isAdmin, async (req, res) => {
+  const orders = await OrderModel.find().populate("user", "name");
+  res.status(200).send(orders);
+});
 
 orderRouter.get(
   // /api/orders/:id
@@ -83,3 +83,34 @@ orderRouter.put(
     }
   })
 );
+
+orderRouter.put(
+  "/:id/deliver",
+  isAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const order = await OrderModel.findById(req.params.id);
+
+    if (order) {
+      order.isDelivered = true;
+      order.deliveredAt = new Date(Date.now());
+      const updatedOrder = await order.save();
+
+      res.status(200).send({
+        order: updatedOrder,
+        message: "Order Delivered Successfully",
+      });
+    } else {
+      res.status(404).json({ message: "Order Not Found" });
+    }
+  })
+);
+
+orderRouter.delete("/:id", isAuth, isAdmin, async (req, res) => {
+  const order = await OrderModel.findOne({ _id: req.params.id });
+  if (order) {
+    const deletedOrder = await order.deleteOne();
+    res.send(deletedOrder);
+  } else {
+    res.status(404).send("Order Not Found.");
+  }
+});
