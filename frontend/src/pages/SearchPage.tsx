@@ -1,94 +1,37 @@
-import axios from 'axios';
-import { useEffect, useReducer, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import { Helmet } from 'react-helmet-async';
-//import LinkContainer from 'react-router-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import LoadingBox from '../components/LoadingBox';
-import MessageBox from '../components/MessageBox';
-import Product from '../components/ProductItem';
-import Rating from '../components/Rating';
-import { ApiError } from '../types/ApiError';
-import { getError } from '../utils';
-
-interface Product {
-  _id: string;
-  name: string;
-  slug: string;
-  image: string;
-  category: string;
-  brand: string;
-  price: number;
-  countInStock:number;
-  description:string;
-  rating: number;
-  numReviews:number;
-  discount:number;
-  maxQuantity: number
-  // Define other properties of Product interface as per your data structure
-}
-
-interface Filter {
-  page?: number;
-  category?: string;
-  query?: string;
-  rating?: string|number;
-  price?: string;
-  order?: string;
-}
-
-interface State {
-  loading: boolean;
-  error: string;
-  products: Product[];
-  pages: number;
-  countProducts: number;
-}
-
-type Action =
-  | { type: 'FETCH_REQUEST' }
-  | { type: 'FETCH_SUCCESS'; payload: { products: Product[]; page: number; pages: number; countProducts: number } }
-  | { type: 'FETCH_FAIL'; payload: string };
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case 'FETCH_REQUEST':
-      return { ...state, loading: true };
-    case 'FETCH_SUCCESS':
-      return {
-        ...state,
-        products: action.payload.products,
-        pages: action.payload.pages,
-        countProducts: action.payload.countProducts,
-        loading: false,
-      };
-    case 'FETCH_FAIL':
-      return { ...state, loading: false, error: action.payload };
-    default:
-      return state;
-  }
-};
+import Button from 'react-bootstrap/Button'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
+import { Helmet } from 'react-helmet-async'
+import { LinkContainer } from 'react-router-bootstrap'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import LoadingBox from '../components/LoadingBox'
+import MessageBox from '../components/MessageBox'
+import ProductItem from '../components/ProductItem'
+import Rating from '../components/Rating'
+import {
+  useGetCategoriesQuery,
+  useSearchProductsQuery,
+} from '../hooks/productHooks'
+import { ApiError } from '../types/ApiError'
+import { getError } from '../utils'
 
 const prices = [
   {
-    name: 'Rs.1 to Rs.50',
+    name: 'Rs1 to Rs50',
     value: '1-50',
   },
   {
-    name: 'Rs.51 to Rs.200',
+    name: 'Rs51 to Rs200',
     value: '51-200',
   },
   {
-    name: 'Rs.201 to Rs.1000',
+    name: 'Rs201 to Rs1000',
     value: '201-1000',
   },
-];
+]
 
-const ratings = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const ratings = [
   {
     name: '4stars & up',
     rating: 4,
@@ -108,62 +51,55 @@ const ratings = [
     name: '1stars & up',
     rating: 1,
   },
-];
+]
 
 export default function SearchPage() {
-  const navigate = useNavigate();
-  const { search } = useLocation();
-  const sp = new URLSearchParams(search); // /search?category=Shirts
-  const category = sp.get('category') || 'all';
-  const query = sp.get('query') || 'all';
-  const price = sp.get('price') || 'all';
-  const rating = sp.get('rating') || 'all';
-  const order = sp.get('order') || 'newest';
-  const page = sp.get('page') || '1';
+  const navigate = useNavigate()
+  const { search } = useLocation()
+  const sp = new URLSearchParams(search)
+  const category = sp.get('category') || 'all'
+  const query = sp.get('query') || 'all'
+  const price = sp.get('price') || 'all'
+  const rating = sp.get('rating') || 'all'
+  const order = sp.get('order') || 'newest'
+  const page = Number(sp.get('page') || 1)
 
-  const [{ loading, error, products, pages, countProducts }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-    products: [],
-    pages: 0,
-    countProducts: 0,
-  });
+  const { data, isLoading, error } = useSearchProductsQuery({
+    category,
+    order,
+    page,
+    price,
+    query,
+    rating,
+  })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await axios.get(`/api/products/search?query=${query}&category=${category}&price=${price}&rating=${rating}&order=${order}`);
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
-      } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err as unknown as ApiError) });
-      }
-    };
-    fetchData();
-  }, [category, error, order, page, price, query, rating]);
+  const {
+    data: categories,
+    isLoading: loadingCategories,
+    error: errorCategories,
+  } = useGetCategoriesQuery()
 
-  const [categories, setCategories] = useState<string[]>([]);
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const { data } = await axios.get(`/api/products/categories`);
-        setCategories(data);
-      } catch (err) {
-        toast.error(getError(err as unknown as ApiError));
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  const getFilterUrl = (filter: Filter, skipPathname?: boolean): string => {
-    const filterPage = filter.page || page;
-    const filterCategory = filter.category || category;
-    const filterQuery = filter.query || query;
-    const filterRating = filter.rating || rating;
-    const filterPrice = filter.price || price;
-    const sortOrder = filter.order || order;
-    return `${skipPathname ? '' : '/search?'}category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`;
-  };
-
+  const getFilterUrl = (
+    filter: {
+      category?: string
+      price?: string
+      rating?: string
+      order?: string
+      page?: number
+      query?: string
+    },
+    skipPathname: boolean = false
+  ) => {
+    const filterPage = filter.page || page
+    const filterCategory = filter.category || category
+    const filterQuery = filter.query || query
+    const filterRating = filter.rating || rating
+    const filterPrice = filter.price || price
+    const sortOrder = filter.order || order
+    return `${
+      skipPathname ? '' : '/search?'
+    }category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`
+  }
   return (
     <div>
       <Helmet>
@@ -182,16 +118,25 @@ export default function SearchPage() {
                   Any
                 </Link>
               </li>
-              {Array.isArray(categories) && categories.map((c) => (
-                <li key={c}>
-                  <Link
-                    className={c === category ? 'text-bold' : ''}
-                    to={getFilterUrl({ category: c })}
-                  >
-                    {c}
-                  </Link>
-                </li>
-              ))}
+
+              {loadingCategories ? (
+                <LoadingBox />
+              ) : error ? (
+                <MessageBox variant="danger">
+                  {getError(errorCategories as unknown as ApiError)}
+                </MessageBox>
+              ) : (
+                categories!.map((c) => (
+                  <li key={c}>
+                    <Link
+                      className={c === category ? 'text-bold' : ''}
+                      to={getFilterUrl({ category: c })}
+                    >
+                      {c}
+                    </Link>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
           <div>
@@ -223,7 +168,7 @@ export default function SearchPage() {
               {ratings.map((r) => (
                 <li key={r.name}>
                   <Link
-                    to={getFilterUrl({ rating: r.rating })}
+                    to={getFilterUrl({ rating: r.rating.toString() })}
                     className={`${r.rating}` === `${rating}` ? 'text-bold' : ''}
                   >
                     <Rating caption={' & up'} rating={r.rating}></Rating>
@@ -242,16 +187,19 @@ export default function SearchPage() {
           </div>
         </Col>
         <Col md={9}>
-          {loading ? (
+          {isLoading ? (
             <LoadingBox></LoadingBox>
           ) : error ? (
-            <MessageBox variant="danger">{error}</MessageBox>
+            <MessageBox variant="danger">
+              {getError(error as unknown as ApiError)}
+            </MessageBox>
           ) : (
             <>
               <Row className="justify-content-between mb-3">
                 <Col md={6}>
                   <div>
-                    {countProducts === 0 ? 'No' : countProducts} Results
+                    {data!.countProducts === 0 ? 'No' : data!.countProducts}{' '}
+                    Results
                     {query !== 'all' && ' : ' + query}
                     {category !== 'all' && ' : ' + category}
                     {price !== 'all' && ' : Price ' + price}
@@ -274,7 +222,7 @@ export default function SearchPage() {
                   <select
                     value={order}
                     onChange={(e) => {
-                      navigate(getFilterUrl({ order: e.target.value }));
+                      navigate(getFilterUrl({ order: e.target.value }))
                     }}
                   >
                     <option value="newest">Newest Arrivals</option>
@@ -284,44 +232,35 @@ export default function SearchPage() {
                   </select>
                 </Col>
               </Row>
-              {products&&products.length === 0 && (
+              {data!.products.length === 0 && (
                 <MessageBox>No Product Found</MessageBox>
               )}
 
               <Row>
-                {products&&products.map((product) => (
+                {data!.products.map((product) => (
                   <Col sm={6} lg={4} className="mb-3" key={product._id}>
-                    <Product product={product}></Product>
+                    <ProductItem product={product}></ProductItem>
                   </Col>
                 ))}
               </Row>
 
               <div>
-                {[...Array(pages).keys()].map((x) => (
-                  <LinkContainer key={x + 1} className="mx-1" to={{pathname:'/search',search:getFilterUrl({ page: x + 1 }, true),}}>
-                  <Button
-                    
-                    className={Number(page) === x + 1 ? 'text-bold' : ''}
-                    variant="light"
+                {[...Array(data!.pages).keys()].map((x) => (
+                  <LinkContainer
+                    key={x + 1}
+                    className="mx-1"
+                    to={{
+                      pathname: '/search',
+                      search: getFilterUrl({ page: x + 1 }, true),
+                    }}
                   >
-                    {x + 1}
-                  </Button>
+                    <Button
+                      className={Number(page) === x + 1 ? 'text-bold' : ''}
+                      variant="light"
+                    >
+                      {x + 1}
+                    </Button>
                   </LinkContainer>
-                  // <LinkContainer
-                  //   key={x + 1}
-                  //   className="mx-1"
-                  //   to={{
-                  //     pathname: '/search',
-                  //     seacrh: getFilterUrl({ page: x + 1 }, true),
-                  //   }}
-                  // >
-                  //   <Button
-                  //     className={Number(page) === x + 1 ? 'text-bold' : ''}
-                  //     variant="light"
-                  //   >
-                  //     {x + 1}
-                  //   </Button>
-                  // </LinkContainer>
                 ))}
               </div>
             </>
