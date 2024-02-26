@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { ProductModel } from "../models/productModel";
 import { isAdmin, isAuth } from "../utils";
@@ -65,17 +65,16 @@ productRouter.get(
 
 productRouter.get(
   "/search",
-  asyncHandler(async (req, res) => {
-    const { query } = req;
-    const pageSize: number = Number(query.pageSize) || PAGE_SIZE;
-    const page: number = Number(query.page || 1);
-    const category: string = String(query.category || "");
-    const price: string = String(query.price || "");
-    const rating: string = String(query.rating || "");
-    const order: string = String(query.order || "");
-    const searchQuery: string = String(query.query || "");
+  asyncHandler(async (req: Request, res: Response) => {
+    const page = Number(req.query.page) || 1;
+    const searchQuery = req.query.query || "";
+    const category = (req.query.category || "") as string;
+    const order = (req.query.order || "") as string;
+    const price = (req.query.price || "") as string;
 
-    const queryFilter: any =
+    const rating = req.query.rating || "";
+
+    const queryFilter =
       searchQuery && searchQuery !== "all"
         ? {
             name: {
@@ -84,17 +83,9 @@ productRouter.get(
             },
           }
         : {};
-    const categoryFilter: any =
-      category && category !== "all" ? { category } : {};
-    const ratingFilter: any =
-      rating && rating !== "all"
-        ? {
-            rating: {
-              $gte: Number(rating),
-            },
-          }
-        : {};
-    const priceFilter: any =
+
+    const categoryFilter = category && category !== "all" ? { category } : {};
+    const priceFilter =
       price && price !== "all"
         ? {
             // 1-50
@@ -104,39 +95,38 @@ productRouter.get(
             },
           }
         : {};
-    const sortOrder: any =
-      order === "featured"
-        ? { featured: -1 }
-        : order === "lowest"
-        ? { price: 1 }
-        : order === "highest"
-        ? { price: -1 }
-        : order === "toprated"
-        ? { rating: -1 }
-        : order === "newest"
-        ? { createdAt: -1 }
-        : { _id: -1 };
+
+    const ratingFilter =
+      rating && rating !== "all" ? { rating: { $gte: Number(rating) } } : {};
+
+    const countProducts = await ProductModel.countDocuments({
+      ...queryFilter,
+      ...categoryFilter,
+      ...priceFilter,
+      ...ratingFilter,
+    });
     const products = await ProductModel.find({
       ...queryFilter,
       ...categoryFilter,
       ...priceFilter,
       ...ratingFilter,
     })
-      .sort(sortOrder)
-      .skip(pageSize * (page - 1))
-      .limit(pageSize);
-
-    const countProducts: number = await ProductModel.countDocuments({
-      ...queryFilter,
-      ...categoryFilter,
-      ...priceFilter,
-      ...ratingFilter,
-    });
+      .sort(
+        order === "lowest"
+          ? { price: 1 }
+          : order === "highest"
+          ? { price: -1 }
+          : order === "toprated"
+          ? { rating: -1 }
+          : { _id: -1 }
+      )
+      .skip(PAGE_SIZE * (page - 1))
+      .limit(PAGE_SIZE);
     res.send({
       products,
       countProducts,
       page,
-      pages: Math.ceil(countProducts / pageSize),
+      pages: Math.ceil(countProducts / PAGE_SIZE),
     });
   })
 );
