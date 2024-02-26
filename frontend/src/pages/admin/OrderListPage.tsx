@@ -1,45 +1,95 @@
-import { Button, Table } from "react-bootstrap";
-import { FaTimes } from "react-icons/fa";
-import { LinkContainer } from "react-router-bootstrap";
-import LoadingBox from "../../components/LoadingBox";
-import MessageBox from "../../components/MessageBox";
-import { useGetOrdersQuery } from "../../hooks/orderHooks";
-import { ApiError } from "../../types/ApiError";
-import { getError } from "../../utils";
-const OrderListPage = () => {
-    const {data:orders, isLoading, error}=useGetOrdersQuery();
-    console.log(orders);
-    
-    
-  return <>
-  <h1>Orders</h1>{isLoading?<LoadingBox/>:error?<MessageBox variant="danger">{getError(error as unknown as ApiError)}</MessageBox>:(
-    <Table striped hover responsive className='table-sm'>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>USER</th>
-                <th>DATE</th>
-                <th>TOTAL</th>
-                <th>PAID</th>
-                <th>DELIVERED</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-          {orders?.map((order)=>(<tr key={order._id}>
-            <td>{order._id}</td>
-            <td>{order.user && order.user.name}</td>
-            <td>{order.createdAt?.substring(0,10)}</td>
-            <td><span>&#8377;</span>{order.totalPrice}</td>
-            <td>{order.isPaid?(order.paidAt):(<FaTimes style={{color:'red'}}/>)}</td>
-            <td>{order.isDelivered?(order.deliveredAt):(<FaTimes style={{color:'red'}}/>)}</td>
-            <td><LinkContainer to={`/order/${order._id}`}>
-              <Button variant="light" className="btn-sm">Details</Button></LinkContainer></td>
-          </tr>))}
-           
-        </tbody>
-    </Table>
-  )}</>
-}
+import Button from 'react-bootstrap/Button'
+import { Helmet } from 'react-helmet-async'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import LoadingBox from '../../components/LoadingBox'
+import MessageBox from '../../components/MessageBox'
+import { useDeleteOrderMutation, useGetOrdersQuery } from '../../hooks/orderHooks'
+import { ApiError } from '../../types/ApiError'
+import { getError } from '../../utils'
 
-export default OrderListPage
+export default function OrderListPage() {
+  const navigate = useNavigate()
+
+  const { data: orders, isLoading, error, refetch } = useGetOrdersQuery()
+
+  const { mutateAsync: deleteOrder, isPending: loadingDelete } =
+    useDeleteOrderMutation()
+
+  const deleteHandler = async (id: string) => {
+    if (window.confirm('Are you sure to delete?')) {
+      try {
+        deleteOrder(id)
+        refetch()
+        toast.success('Order deleted successfully')
+      } catch (err) {
+        toast.error(getError(err as ApiError))
+      }
+    }
+  }
+
+  return (
+    <div>
+      <Helmet>
+        <title>Orders</title>
+      </Helmet>
+      <h1>Orders</h1>
+      {loadingDelete && <LoadingBox></LoadingBox>}
+      {isLoading ? (
+        <LoadingBox></LoadingBox>
+      ) : error ? (
+        <MessageBox variant="danger">{getError(error as unknown as ApiError)}</MessageBox>
+      ) : (
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>USER</th>
+              <th>DATE</th>
+              <th>TOTAL</th>
+              <th>PAID</th>
+              <th>DELIVERED</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders!.map((order) => (
+              <tr key={order._id}>
+                <td>{order._id}</td>
+                <td>{order.user ? order.user.name : 'DELETED USER'}</td>
+                <td>{order.createdAt?.substring(0, 10)}</td>
+                <td>{order.totalPrice.toFixed(2)}</td>
+                <td>{order.isPaid ? order.paidAt?.substring(0, 10) : 'No'}</td>
+
+                <td>
+                  {order.isDelivered
+                    ? order.deliveredAt?.substring(0, 10)
+                    : 'No'}
+                </td>
+                <td>
+                  <Button
+                    type="button"
+                    variant="light"
+                    onClick={() => {
+                      navigate(`/order/${order._id}`)
+                    }}
+                  >
+                    Details
+                  </Button>
+                  &nbsp;
+                  <Button
+                    type="button"
+                    variant="light"
+                    onClick={() => deleteHandler(order._id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  )
+}

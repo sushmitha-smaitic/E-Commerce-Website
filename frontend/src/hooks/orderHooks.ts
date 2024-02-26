@@ -3,6 +3,13 @@ import apiClient from "../apiClient";
 import { cartItem, shippingAddress } from "../types/Cart";
 import { Order } from "../types/Order";
 
+export const useDeleteOrderMutation = () =>
+  useMutation({
+    mutationFn: async (orderId: string) =>
+      (await apiClient.delete<{ message: string }>(`api/orders/${orderId}`))
+        .data,
+  });
+
 export const useGetOrderSummaryQuery = () =>
   useQuery({
     queryKey: ["orders-summary"],
