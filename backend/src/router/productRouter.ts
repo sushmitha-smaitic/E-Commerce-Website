@@ -41,6 +41,67 @@ productRouter.post(
   })
 );
 
+productRouter.put(
+  "/:id",
+  isAuth,
+  isAdmin,
+  asyncHandler(async (req: Request, res: Response) => {
+    const productId = req.params.id;
+    const product = await ProductModel.findById(productId);
+    if (product) {
+      product.name = req.body.name;
+      product.slug = req.body.slug;
+      product.price = req.body.price;
+      product.image = req.body.image;
+      product.category = req.body.category;
+      product.brand = req.body.brand;
+      product.countInStock = req.body.countInStock;
+      product.description = req.body.description;
+      const updatedProduct = await product.save();
+      res.send({ message: "Product Updated", product: updatedProduct });
+    } else {
+      res.status(404).send({ message: "Product Not Found" });
+    }
+  })
+);
+
+productRouter.delete(
+  "/:id",
+  isAuth,
+  isAdmin,
+  asyncHandler(async (req: Request, res: Response) => {
+    const product = await ProductModel.findById(req.params.id);
+    if (product) {
+      const deleteProduct = await product.deleteOne();
+      res.send({ message: "Product Deleted", product: deleteProduct });
+    } else {
+      res.status(404).send({ message: "Product Not Found" });
+    }
+  })
+);
+
+productRouter.get(
+  "/admin",
+  isAuth,
+  isAdmin,
+  asyncHandler(async (req: Request, res: Response) => {
+    const { query } = req;
+    const page = Number(query.page || 1);
+    const pageSize = Number(query.pageSize) || PAGE_SIZE;
+
+    const products = await ProductModel.find()
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+    const countProducts = await ProductModel.countDocuments();
+    res.send({
+      products,
+      countProducts,
+      page,
+      pages: Math.ceil(countProducts / PAGE_SIZE),
+    });
+  })
+);
+
 // /api/products/categories
 productRouter.get(
   "/categories",
@@ -128,6 +189,18 @@ productRouter.get(
       page,
       pages: Math.ceil(countProducts / PAGE_SIZE),
     });
+  })
+);
+
+productRouter.get(
+  "/:id",
+  asyncHandler(async (req: Request, res: Response) => {
+    const product = await ProductModel.findById(req.params.id);
+    if (product) {
+      res.send(product);
+    } else {
+      res.status(404).send({ message: "Product Not Found" });
+    }
   })
 );
 
