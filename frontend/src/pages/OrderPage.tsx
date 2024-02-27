@@ -10,7 +10,7 @@ import { Store } from '../Store'
 import LoadingBox from '../components/LoadingBox'
 import MessageBox from '../components/MessageBox'
 import {
-  //useDeliveredOrderMutation,
+  useDeliverOrderMutation,
   useGetOrderDetailsQuery, useGetPaypalClientIdQuery, usePayOrderMutation
 } from '../hooks/orderHooks'
 import { ApiError } from '../types/ApiError'
@@ -33,7 +33,7 @@ import { getError } from '../utils'
     } = useGetOrderDetailsQuery(orderId!)
   
     const { mutateAsync: payOrder, isPending: loadingPay } = usePayOrderMutation()
-    //const {mutateAsync: deliverOrder, isPending:loadingDelivered }=useDeliveredOrderMutation()
+    const {mutateAsync: deliverOrder, isPending:loadingDelivered }=useDeliverOrderMutation()
   
     const testPayHandler = async () => {
       await payOrder({ orderId: orderId! })
@@ -97,19 +97,15 @@ import { getError } from '../utils'
       },
     }
 
-    // const deliverOrderHandler=async()=>{
-    //   if (!orderId) {
-    //     toast.error('orderId is undefined')
-    //     return;
-    //   }
-    //   try{
-    //     await deliverOrder({orderId});
-    //     refetch();
-    //     toast.success('Order Delivered')
-    //   }catch(err){
-    //     getError(err as unknown as ApiError)
-    //   }
-    // }
+    async function deliverOrderHandler() {
+      try {
+        await deliverOrder(orderId!)
+        refetch()
+        toast.success('Order is delivered')
+      } catch (err) {
+        toast.error(getError(err as ApiError))
+      }
+    }
   
     return isPending ? (
       <LoadingBox></LoadingBox>
@@ -239,12 +235,12 @@ import { getError } from '../utils'
                     </ListGroup.Item>
                   )}
 
-                  {/* {loadingDelivered && <LoadingBox/>}
+                  {loadingDelivered && <LoadingBox/>}
                   {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered &&(
                     <ListGroup.Item>
                       <Button type='button' className='btn btn-block' onClick={deliverOrderHandler}>Mark as Delivered</Button>
                     </ListGroup.Item>
-                  )} */}
+                  )}
                 </ListGroup>
               </Card.Body>
             </Card>

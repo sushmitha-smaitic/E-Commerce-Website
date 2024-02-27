@@ -80,13 +80,12 @@ export const useCreateOrderMutation = () =>
       ).data,
   });
 
-export const useDeliveredOrderMutation = () =>
+export const useDeliverOrderMutation = () =>
   useMutation({
-    mutationFn: async (details: { orderId: string }) =>
+    mutationFn: async (orderId: string) =>
       (
         await apiClient.put<{ message: string; order: Order }>(
-          `api/orders/${details.orderId}`,
-          details
+          `api/orders/${orderId}/deliver`
         )
       ).data,
   });
