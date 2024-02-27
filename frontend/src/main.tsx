@@ -7,10 +7,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import {
-  Route,
-  RouterProvider,
-  createBrowserRouter,
-  createRoutesFromElements,
+    Route,
+    RouterProvider,
+    createBrowserRouter,
+    createRoutesFromElements,
 } from "react-router-dom";
 import App from './App.tsx';
 import { StoreProvider } from './Store.tsx';
@@ -31,7 +31,10 @@ import SignInPage from './pages/SignInPage.tsx';
 import SignupPage from './pages/SignUpPage';
 import DashboardPage from './pages/admin/DashboardPage.tsx';
 import OrderListPage from './pages/admin/OrderListPage.tsx';
+import ProductEditPage from './pages/admin/ProductEditPage.tsx';
 import ProductListPage from './pages/admin/ProductListPage.tsx';
+import UserEditPage from './pages/admin/UserEditPage.tsx';
+import UserListPage from './pages/admin/UserListPage.tsx';
 
 
 const router = createBrowserRouter(
@@ -43,6 +46,8 @@ const router = createBrowserRouter(
       <Route path="/signin" element={<SignInPage/>}/>
       <Route path="/search" element={<SearchPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>
+
+      {/* Normal Users */}
       <Route path='' element={<ProtectedRoute/>}>
         <Route path='/admin' element={<AdminRoute/>}/>
         <Route path='/shipping' element={<ShippingAddressPage/>}/>
@@ -54,10 +59,14 @@ const router = createBrowserRouter(
 
       </Route>
 
+      {/* Admin Users */}
       <Route path='' element={<AdminRoute/>}>
         <Route path='/admin/orders' element={<OrderListPage/>}/>
         <Route path='/admin/dashboard' element={<DashboardPage/>}/>
         <Route path='/admin/products' element={<ProductListPage/>}/>
+        <Route path="/admin/product/:id" element={<ProductEditPage />} />
+        <Route path="/admin/users" element={<UserListPage />} />
+        <Route path="/admin/user/:id" element={<UserEditPage />} />
       </Route>
       {/* <Route path="dashboard" element={<Dashboard />} /> */}
       {/* ... etc. */}

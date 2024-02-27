@@ -6,7 +6,7 @@ export default function AdminRoute(){
     const{
         state: {userInfo},
     }=useContext(Store)
-    if(userInfo?.isAdmin){
+    if(userInfo && userInfo.isAdmin){
         return <Outlet/>
     }else{
         return <Navigate to='/signin'/>

@@ -42,6 +42,13 @@ export const useGetProductDetailsBySlugQuery = (slug: string) =>
       (await apiClient.get<Product>(`api/products/slug/${slug}`)).data,
   });
 
+export const useGetProductDetailsQuery = (id: string) =>
+  useQuery({
+    queryKey: ["products", id],
+    queryFn: async () =>
+      (await apiClient.get<Product>(`api/products/${id}`)).data,
+  });
+
 export const useGetCategoriesQuery = () =>
   useQuery({
     queryKey: ["categories"],
@@ -51,24 +58,67 @@ export const useGetCategoriesQuery = () =>
 
 export const useCreateProductMutation = () =>
   useMutation({
+    mutationFn: async () =>
+      (
+        await apiClient.post<{ product: Product; message: string }>(
+          `api/products`
+        )
+      ).data,
+  });
+
+export const useDeleteProductMutation = () =>
+  useMutation({
+    mutationFn: async (productId: string) =>
+      (await apiClient.delete(`api/products/${productId}`)).data,
+  });
+
+export const useUpdateProductMutation = () =>
+  useMutation({
     mutationFn: async (product: {
       _id: string;
       name: string;
       slug: string;
+      price: number;
       image: string;
+      images: string[];
       category: string;
       brand: string;
-      price: number;
       countInStock: number;
       description: string;
-      rating: number;
-      numReviews: number;
-      discount: number;
     }) =>
       (
-        await apiClient.post<{ message: string; product: Product }>(
-          `/api/products`,
+        await apiClient.put<{ product: Product; message: string }>(
+          `api/products/${product._id}`,
           product
+        )
+      ).data,
+  });
+
+export const useGetAdminProdcutsQuery = (page: number) =>
+  useQuery({
+    queryKey: ["admin-products", page],
+    queryFn: async () =>
+      (
+        await apiClient.get<{
+          products: [Product];
+          page: number;
+          pages: number;
+        }>(`/api/products/admin?page=${page}`)
+      ).data,
+  });
+
+export const useUploadProductMutation = () =>
+  useMutation({
+    mutationFn: async (formData: FormData) =>
+      (
+        await apiClient.post<{ secure_url: string }>(
+          `api/uploads/local`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         )
       ).data,
   });
