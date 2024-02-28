@@ -95,7 +95,8 @@ function reducer(state: AppState, action: Action): AppState {
             address:'',
             postalCode:'',
             city:'',
-            country:''
+            country:'',
+            
           },
           itemsPrice:0,
           shippingPrice:0,

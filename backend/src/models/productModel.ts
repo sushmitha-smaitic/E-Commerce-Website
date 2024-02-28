@@ -1,5 +1,17 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
+@modelOptions({})
+export class Review {
+  @prop({ required: true })
+  public name!: string;
+  @prop({ required: true })
+  public comment!: string;
+  @prop({ required: true })
+  public rating!: number;
+  @prop({ required: true, default: new Date() })
+  public createdAt!: Date;
+}
+
 @modelOptions({ schemaOptions: { timestamps: true } })
 export class Product {
   public _id?: string;
@@ -36,6 +48,9 @@ export class Product {
 
   @prop({ required: true, default: 0 })
   public numReviews!: number;
+
+  @prop()
+  public reviews!: Review[];
 
   @prop({ required: true, default: 0 })
   public discount!: number;

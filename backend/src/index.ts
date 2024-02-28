@@ -1,11 +1,13 @@
 import cors from "cors";
 import dotenv from "dotenv";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
+import path from "path";
 import { keyRouter } from "./router/keyRouter";
 import { orderRouter } from "./router/orderRouter";
 import { productRouter } from "./router/productRouter";
 import { seedRouter } from "./router/seedRouter";
+import { uploadRouter } from "./router/uploadRouter";
 import { userRouter } from "./router/userRouter";
 
 dotenv.config();
@@ -44,10 +46,23 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/products", productRouter);
+app.use("/api/uploads", uploadRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/seed", seedRouter);
 app.use("/api/keys", keyRouter);
+
+app.use("/uploads", express.static(path.join(__dirname, "../../uploads")));
+
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+app.get("*", (req: Request, res: Response) =>
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"))
+);
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  res.status(500).send({ message: err.message });
+  next();
+});
 
 const PORT = 4000;
 app.listen(PORT, () => {

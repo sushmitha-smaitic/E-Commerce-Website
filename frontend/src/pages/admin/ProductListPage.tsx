@@ -7,9 +7,9 @@ import { toast } from 'react-toastify'
 import LoadingBox from '../../components/LoadingBox'
 import MessageBox from '../../components/MessageBox'
 import {
-    useCreateProductMutation,
-    useDeleteProductMutation,
-    useGetAdminProdcutsQuery,
+  useCreateProductMutation,
+  useDeleteProductMutation,
+  useGetAdminProdcutsQuery,
 } from '../../hooks/productHooks'
 import { ApiError } from '../../types/ApiError'
 import { getError } from '../../utils'

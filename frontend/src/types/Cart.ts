@@ -8,6 +8,11 @@ export type cartItem = {
   _id: string;
 };
 
+export type Location = {
+  lat: number;
+  lng: number;
+};
+
 export type shippingAddress = {
   fullName: string;
   address: string;

@@ -19,7 +19,7 @@ productRouter.post(
   "/",
   isAuth,
   isAdmin,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const product = new ProductModel({
       name: "Sample Name",
       price: 5000,
@@ -239,6 +239,41 @@ productRouter.put(
     } else {
       res.status(404);
       throw new Error("Resource not found");
+    }
+  })
+);
+
+//@desc create review
+productRouter.post(
+  "/:id/reviews",
+  isAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const productId = req.params.id;
+    const product = await ProductModel.findById(productId);
+    if (product) {
+      if (product.reviews.find((x) => x.name === req.user.name)) {
+        res.status(400).send({ message: "You already submitted a review" });
+        return;
+      }
+      const review = {
+        name: req.user.name,
+        rating: Number(req.body.rating),
+        comment: req.body.comment,
+        createdAt: new Date(),
+      };
+      product.reviews.push(review);
+      product.numReviews = product.reviews.length;
+      product.rating =
+        product.reviews.reduce((a, c) => c.rating + a, 0) /
+        product.reviews.length;
+      console.log(product.reviews);
+      const updatedProduct = await product.save();
+      res.status(201).send({
+        message: "Review Created",
+        review: updatedProduct.reviews[updatedProduct.reviews.length - 1],
+      });
+    } else {
+      res.status(404).send({ message: "Product Not Found" });
     }
   })
 );

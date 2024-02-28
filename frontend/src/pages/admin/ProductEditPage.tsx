@@ -9,9 +9,9 @@ import { toast } from 'react-toastify'
 import LoadingBox from '../../components/LoadingBox'
 import MessageBox from '../../components/MessageBox'
 import {
-    useGetProductDetailsQuery,
-    useUpdateProductMutation,
-    useUploadProductMutation,
+  useGetProductDetailsQuery,
+  useUpdateProductMutation,
+  useUploadProductMutation,
 } from '../../hooks/productHooks'
 import { ApiError } from '../../types/ApiError'
 import { getError } from '../../utils'
@@ -43,7 +43,7 @@ export default function ProductEditPage() {
       setSlug(product.slug)
       setPrice(product.price)
       setImage(product.image)
-      //setImages(product.images)
+      setImages(product.images)
       setCategory(product.category)
       setCountInStock(product.countInStock)
       setBrand(product.brand)

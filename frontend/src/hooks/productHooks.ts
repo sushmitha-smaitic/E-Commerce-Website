@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import apiClient from "../apiClient";
-import { Product } from "../types/Product";
+import { Product, Review } from "../types/Product";
 
 export const useGetProductsQuery = () =>
   useQuery({
@@ -120,5 +120,27 @@ export const useUploadProductMutation = () =>
             },
           }
         )
+      ).data,
+  });
+
+export const useCreateReviewMutation = () =>
+  useMutation({
+    mutationFn: async ({
+      name,
+      rating,
+      comment,
+      productId,
+    }: {
+      name: string;
+      rating: number;
+      comment: string;
+      productId: string;
+    }) =>
+      (
+        await apiClient.post<Review>(`api/products/${productId}/reviews`, {
+          name,
+          rating,
+          comment,
+        })
       ).data,
   });

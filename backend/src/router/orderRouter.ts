@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import Stripe from "stripe";
 import { Order, OrderModel } from "../models/orderModel";
 import { Product, ProductModel } from "../models/productModel";
 import { UserModel } from "../models/userModel";
@@ -101,6 +102,30 @@ orderRouter.post(
       } as Order);
 
       res.status(201).json({ message: "Order Created", order: createdOrder });
+    }
+  })
+);
+
+orderRouter.post(
+  "/:id/stripe-payment-intent",
+  asyncHandler(async (req, res) => {
+    try {
+      const order = await OrderModel.findById(req.params.id);
+      if (!order) {
+        res.status(404).send({ message: "Order Not Found" });
+        return;
+      }
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+        apiVersion: "2023-10-16",
+      });
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: order.totalPrice * 100,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+      res.status(500).json({ error });
     }
   })
 );

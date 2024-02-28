@@ -89,3 +89,21 @@ export const useDeliverOrderMutation = () =>
         )
       ).data,
   });
+
+export const useGetStripePublishableKeyQuery = () =>
+  useQuery({
+    queryKey: ["stripe-publishable-key"],
+    enabled: true,
+    queryFn: async () =>
+      (await apiClient.get<{ key: string }>(`/api/keys/stripe`)).data,
+  });
+
+export const useCreateStripePaymentIntentMutation = () =>
+  useMutation({
+    mutationFn: async (orderId: string) =>
+      (
+        await apiClient.post<{ clientSecret: string }>(
+          `/api/orders/${orderId}/stripe-payment-intent`
+        )
+      ).data,
+  });

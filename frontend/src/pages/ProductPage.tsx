@@ -1,58 +1,103 @@
-import { useContext } from "react";
-import { Badge, Button, Card, Col, ListGroup, Row } from "react-bootstrap";
-import { Helmet } from "react-helmet-async";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { Store } from "../Store";
-import LoadingBox from "../components/LoadingBox";
-import MessageBox from "../components/MessageBox";
-import Rating from "../components/Rating";
-import { useGetProductDetailsBySlugQuery } from "../hooks/productHooks";
-import { ApiError } from "../types/ApiError";
-import { convertProductToCartItem, getError } from '../utils';
+import React, { useContext, useRef, useState } from 'react'
+import Badge from 'react-bootstrap/Badge'
+import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import Col from 'react-bootstrap/Col'
+import FloatingLabel from 'react-bootstrap/FloatingLabel'
+import Form from 'react-bootstrap/Form'
+import ListGroup from 'react-bootstrap/ListGroup'
+import Row from 'react-bootstrap/Row'
+import { Helmet } from 'react-helmet-async'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { Store } from '../Store'
+import LoadingBox from '../components/LoadingBox'
+import MessageBox from '../components/MessageBox'
+import Rating from '../components/Rating'
+import {
+  useCreateReviewMutation,
+  useGetProductDetailsBySlugQuery,
+} from '../hooks/productHooks'
+import { ApiError } from '../types/ApiError'
+import { Review } from '../types/Product'
+import { convertProductToCartItem, getError } from '../utils'
 
-export default function ProductPage() {
+function ProductPage() {
+  const reviewsRef = useRef<HTMLDivElement>(null)
+
+  const [rating, setRating] = useState(0)
+  const [comment, setComment] = useState('')
+  const [selectedImage, setSelectedImage] = useState('')
+
+  const navigate = useNavigate()
   const params = useParams()
-  const {slug} = params
+  const { slug } = params
+
   const {
     data: product,
+    refetch,
     isLoading,
     error,
   } = useGetProductDetailsBySlugQuery(slug!)
 
-  const {state, dispatch}= useContext(Store)
-  const {cart}= state
+  const { mutateAsync: createReview, isPending: loadingCreateReview } =
+    useCreateReviewMutation()
 
-  const navigate = useNavigate()
+  const { state, dispatch } = useContext(Store)
+  const { cart, userInfo } = state
 
-  const addToCartHandler =()=>{
-    const existItem= cart.cartItems.find((x)=>x._id===product!._id)
-    const quantity=existItem?existItem.quantity + 1 : 1
-    if(product!.countInStock<quantity){
-      toast.warn('Sorry, Product is Out Of Stock')
+  const addToCartHandler = async () => {
+    const existItem = cart.cartItems.find((x) => x._id === product!._id)
+    const quantity = existItem ? existItem.quantity + 1 : 1
+    if (product!.countInStock < quantity) {
+      toast.warn('Sorry. Product is out of stock')
       return
     }
     dispatch({
-      type:'CART_ADD_ITEM',
-      payload:{...convertProductToCartItem(product!),quantity},
+      type: 'CART_ADD_ITEM',
+      payload: { ...convertProductToCartItem(product!), quantity },
     })
-    toast.success('Product added to the cart')
     navigate('/cart')
   }
-  return (
-    isLoading?(
-      <LoadingBox/>
-    ):
-    error ? (
-      <MessageBox variant="danger">{getError(error as unknown as ApiError)}</MessageBox>
-    ): !product ? (
-      <MessageBox variant="danger">Product Not Found</MessageBox>
-    )
-    :
-    (<div>
+
+  const submitHandler = async (e: React.SyntheticEvent) => {
+    e.preventDefault()
+    if (!comment || !rating) {
+      toast.error('Please enter comment and rating')
+      return
+    }
+    try {
+      await createReview({
+        productId: product!._id,
+        rating,
+        comment,
+        name: userInfo!.name,
+      })
+      refetch()
+      toast.success('Review submitted successfully')
+      window.scrollTo({
+        behavior: 'smooth',
+        top: reviewsRef.current!.offsetTop,
+      })
+      setComment('')
+      setRating(0)
+    } catch (err) {
+      toast.error(getError(err as ApiError))
+    }
+  }
+  return isLoading ? (
+    <LoadingBox />
+  ) : error ? (
+    <MessageBox variant="danger">{getError(error as unknown as ApiError)}</MessageBox>
+  ) : product ? (
+    <div>
       <Row>
         <Col md={6}>
-          <img className="large" src={product.image} alt={product.name}></img>
+          <img
+            className="large"
+            src={selectedImage || product.image}
+            alt={product.name}
+          ></img>
         </Col>
         <Col md={3}>
           <ListGroup variant="flush">
@@ -68,15 +113,36 @@ export default function ProductPage() {
                 numReviews={product.numReviews}
               ></Rating>
             </ListGroup.Item>
-            <ListGroup.Item>Price : <span>&#8377;</span>{product.price}</ListGroup.Item>
+            <ListGroup.Item>Price : <span>&#8377;</span>{product!.price}</ListGroup.Item>
             <ListGroup.Item>
-              Description:<p>{product.description}</p>
+              <Row xs={1} md={2} className="g-2">
+                {[product.image, ...product.images].map((x) => (
+                  <Col key={x}>
+                    <Card>
+                      <Button
+                        className="thumbnail"
+                        type="button"
+                        variant="light"
+                        onClick={() => setSelectedImage(x)}
+                      >
+                        <Card.Img variant="top" src={x} alt="product" />
+                      </Button>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
             </ListGroup.Item>
             <ListGroup.Item>
-              Discount:<p>{product.discount}<span>&#37;</span></p>
+              Description:
+              <p>{product.description}</p>
             </ListGroup.Item>
             <ListGroup.Item>
-              Max Quantity:<p>{product.maxQuantity}</p>
+              Discount:
+              <p>{product.discount}%</p>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              Max Quantity:
+              <p>{product.maxQuantity}</p>
             </ListGroup.Item>
           </ListGroup>
         </Col>
@@ -84,36 +150,109 @@ export default function ProductPage() {
           <Card>
             <Card.Body>
               <ListGroup variant="flush">
-              <ListGroup.Item>
-                <Row>
-                  <Col>Price:</Col>
-                  <Col><span>&#8377;</span>{product.price}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Status:</Col>
-                  <Col>{product.countInStock > 0 ? (
-                    <Badge bg="success">In Stock</Badge>
-                  ):(
-                    <Badge bg="danger">Unavailable</Badge>
-                  )}
-                  </Col>
-                </Row>
-              </ListGroup.Item>
-              {product.countInStock > 0 && (
                 <ListGroup.Item>
-                  <div className="d-grid">
-                    <Button variant="primary" onClick={addToCartHandler}>Add to Cart</Button>
-                  </div>
+                  <Row>
+                    <Col>Price:</Col>
+                    <Col><span>&#8377;</span>{product!.price}</Col>
+                  </Row>
                 </ListGroup.Item>
-              )}
-            </ListGroup>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Status:</Col>
+                    <Col>
+                      {product!.countInStock > 0 ? (
+                        <Badge bg="success">In Stock</Badge>
+                      ) : (
+                        <Badge bg="danger">Unavailable</Badge>
+                      )}
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+
+                {product.countInStock > 0 && (
+                  <ListGroup.Item>
+                    <div className="d-grid">
+                      <Button onClick={addToCartHandler} variant="primary">
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                )}
+              </ListGroup>
             </Card.Body>
           </Card>
         </Col>
       </Row>
+      <div className="my-3">
+        <h2 ref={reviewsRef}>Reviews</h2>
+        <div className="mb-3">
+          {product.reviews.length === 0 && (
+            <MessageBox>There is no review</MessageBox>
+          )}
+        </div>
+        <ListGroup>
+          {product.reviews.map((review: Review) => (
+            <ListGroup.Item key={review.createdAt}>
+              <strong>{review.name}</strong>
+              <Rating rating={review.rating} numReviews={0} caption=""></Rating>
+              <p>{review.createdAt.substring(0, 10)}</p>
+              <p>{review.comment}</p>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+        <div className="my-3">
+          {userInfo ? (
+            <form onSubmit={submitHandler}>
+              <h2>Write a customer review</h2>
+              <Form.Group className="mb-3" controlId="rating">
+                <Form.Label>Rating</Form.Label>
+                <Form.Select
+                  aria-label="Rating"
+                  value={rating}
+                  onChange={(e) => setRating(Number(e.target.value))}
+                >
+                  <option value="">Select...</option>
+                  <option value="1">1- Poor</option>
+                  <option value="2">2- Fair</option>
+                  <option value="3">3- Good</option>
+                  <option value="4">4- Very good</option>
+                  <option value="5">5- Excelent</option>
+                </Form.Select>
+              </Form.Group>
+              <FloatingLabel
+                controlId="floatingTextarea"
+                label="Comments"
+                className="mb-3"
+              >
+                <Form.Control
+                  as="textarea"
+                  placeholder="Leave a comment here"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </FloatingLabel>
+
+              <div className="mb-3">
+                <Button disabled={loadingCreateReview} type="submit">
+                  Submit
+                </Button>
+                {loadingCreateReview && <LoadingBox></LoadingBox>}
+              </div>
+            </form>
+          ) : (
+            <MessageBox>
+              Please{' '}
+              <Link to={`/signin?redirect=/product/${product.slug}`}>
+                Sign In
+              </Link>{' '}
+              to write a review
+            </MessageBox>
+          )}
+        </div>
+      </div>
     </div>
+  ) : (
+    <div>no product</div>
   )
-)
 }
+export default ProductPage

@@ -7,10 +7,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import {
-    Route,
-    RouterProvider,
-    createBrowserRouter,
-    createRoutesFromElements,
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
 } from "react-router-dom";
 import App from './App.tsx';
 import { StoreProvider } from './Store.tsx';
@@ -49,7 +49,7 @@ const router = createBrowserRouter(
 
       {/* Normal Users */}
       <Route path='' element={<ProtectedRoute/>}>
-        <Route path='/admin' element={<AdminRoute/>}/>
+        {/* <Route path='/admin' element={<AdminRoute/>}/> */}
         <Route path='/shipping' element={<ShippingAddressPage/>}/>
         <Route path='/payment' element={<PaymentMethodPage/>}/>
         <Route path='/placeorder' element={<PlaceOrderPage/>}/>
@@ -60,13 +60,13 @@ const router = createBrowserRouter(
       </Route>
 
       {/* Admin Users */}
-      <Route path='' element={<AdminRoute/>}>
-        <Route path='/admin/orders' element={<OrderListPage/>}/>
-        <Route path='/admin/dashboard' element={<DashboardPage/>}/>
-        <Route path='/admin/products' element={<ProductListPage/>}/>
-        <Route path="/admin/product/:id" element={<ProductEditPage />} />
-        <Route path="/admin/users" element={<UserListPage />} />
-        <Route path="/admin/user/:id" element={<UserEditPage />} />
+      <Route path='/admin' element={<AdminRoute/>}>
+        <Route path='orders' element={<OrderListPage/>}/>
+        <Route path='dashboard' element={<DashboardPage/>}/>
+        <Route path='products' element={<ProductListPage/>}/>
+        <Route path="product/:id" element={<ProductEditPage />} />
+        <Route path="users" element={<UserListPage />} />
+        <Route path="user/:id" element={<UserEditPage />} />
       </Route>
       {/* <Route path="dashboard" element={<Dashboard />} /> */}
       {/* ... etc. */}
