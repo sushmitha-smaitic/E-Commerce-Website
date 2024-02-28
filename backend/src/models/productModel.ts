@@ -57,6 +57,12 @@ export class Product {
 
   @prop({ required: true, default: 0 })
   public maxQuantity!: number;
+
+  @prop({ required: true, default: false })
+  public isFeatured!: boolean;
+
+  @prop()
+  public banner?: string;
 }
 
 export const ProductModel = getModelForClass(Product);

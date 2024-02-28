@@ -19,6 +19,7 @@ export type shippingAddress = {
   city: string;
   country: string;
   postalCode: string;
+  //location: Location;
 };
 
 export type Cart = {

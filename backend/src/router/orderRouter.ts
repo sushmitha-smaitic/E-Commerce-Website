@@ -139,12 +139,21 @@ orderRouter.put(
     if (order) {
       order.isPaid = true;
       order.paidAt = new Date(Date.now());
-      order.paymentResult = {
-        paymentId: req.body.id,
-        status: req.body.status,
-        update_time: req.body.update_time,
-        email_address: req.body.email_address,
-      };
+      order.paymentResult =
+        req.body.object === "payment_intent" // stripe
+          ? {
+              paymentId: req.body.id,
+              status: req.body.status,
+              update_time: req.body.created,
+              email_address: req.body.receipt_email,
+            }
+          : {
+              // paypal
+              paymentId: req.body.id,
+              status: req.body.status,
+              update_time: req.body.update_time,
+              email_address: req.body.email_address,
+            };
       const updatedOrder = await order.save();
 
       res.send({ order: updatedOrder, message: "Order Paid Successfully" });

@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { Product } from "./models/productModel";
 import { User } from "./models/userModel";
 
-export const sampleProducts: Product[] = [
+export const products: Product[] = [
   {
     name: "Nike Slim Shirt",
     slug: "nike-slim-shirt",
@@ -20,6 +20,8 @@ export const sampleProducts: Product[] = [
     images: ["../images/p11.jpg"],
     discount: 12,
     maxQuantity: 5,
+    isFeatured: true,
+    banner: "../images/b1.jpg",
   },
   {
     name: "Adidas Fit Shirt",
@@ -36,6 +38,8 @@ export const sampleProducts: Product[] = [
     images: [],
     discount: 10,
     maxQuantity: 7,
+    isFeatured: true,
+    banner: "../images/b2.jpg",
   },
   {
     name: "Lacoste Free Pants",
@@ -52,6 +56,7 @@ export const sampleProducts: Product[] = [
     images: [],
     discount: 15,
     maxQuantity: 21,
+    isFeatured: false,
   },
   {
     name: "Nike Slim Pant",
@@ -68,10 +73,11 @@ export const sampleProducts: Product[] = [
     images: [],
     discount: 12,
     maxQuantity: 12,
+    isFeatured: false,
   },
 ];
 
-export const sampleUsers: User[] = [
+export const users: User[] = [
   {
     name: "Michael",
     email: "admin@example.com",

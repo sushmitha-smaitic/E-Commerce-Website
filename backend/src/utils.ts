@@ -39,7 +39,6 @@ export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  //const { authorization } = req.headers;
   if (req.user && req.user.isAdmin) {
     next();
   } else {

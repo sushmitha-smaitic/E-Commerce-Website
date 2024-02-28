@@ -5,7 +5,13 @@ import { Product, Review } from "../types/Product";
 export const useGetProductsQuery = () =>
   useQuery({
     queryKey: ["products"],
-    queryFn: async () => (await apiClient.get<Product[]>(`api/products`)).data,
+    queryFn: async () =>
+      (
+        await apiClient.get<{
+          featuredProducts: Product[];
+          latestProducts: Product[];
+        }>(`api/products`)
+      ).data,
   });
 export const useSearchProductsQuery = ({
   page,

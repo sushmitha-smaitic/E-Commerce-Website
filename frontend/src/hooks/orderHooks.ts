@@ -93,7 +93,7 @@ export const useDeliverOrderMutation = () =>
 export const useGetStripePublishableKeyQuery = () =>
   useQuery({
     queryKey: ["stripe-publishable-key"],
-    enabled: true,
+    enabled: false,
     queryFn: async () =>
       (await apiClient.get<{ key: string }>(`/api/keys/stripe`)).data,
   });

@@ -1,43 +1,52 @@
 import express, { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
-import { ProductModel } from "../models/productModel";
+import { Product, ProductModel } from "../models/productModel";
 import { isAdmin, isAuth } from "../utils";
 
 export const productRouter = express.Router();
-
+const PAGE_SIZE = 3;
 // /api/products
 productRouter.get(
   "/",
   asyncHandler(async (req, res) => {
-    const products = await ProductModel.find();
-    res.json(products);
+    const latestProducts = await ProductModel.find({}, "-reviews")
+      .sort({ _id: -1 })
+      .limit(6);
+    const featuredProducts = await ProductModel.find(
+      {
+        isFeatured: true,
+      },
+      "_id name banner slug"
+    ).limit(3);
+    res.send({ latestProducts, featuredProducts });
   })
 );
 
-const PAGE_SIZE = 3;
 productRouter.post(
   "/",
   isAuth,
   isAdmin,
   asyncHandler(async (req: Request, res: Response) => {
-    const product = new ProductModel({
-      name: "Sample Name",
-      price: 5000,
-      user: req.user._id,
-      image: "../../../frontend/public/images/Sample.jpg",
+    const product = await ProductModel.create({
+      name: "Sample Name" + Date.now(),
+      price: 0,
+      image: "../assets/images/p1.jpg",
       brand: "Sample Brand",
-      slug: "SampleProduct2",
-      category: "Shirt",
+      slug: "sample-slug-" + Date.now(),
+      category: "sample category",
       countInStock: 0,
       numReviews: 0,
       maxQuantity: 0,
       rating: 4.5,
       discount: 10,
       description: "Sample Description",
-    });
+    } as Product);
 
     const createdProduct = await product.save();
-    res.status(201).send(createdProduct);
+    res.send({
+      message: "Product Created",
+      product: createdProduct,
+    });
   })
 );
 
