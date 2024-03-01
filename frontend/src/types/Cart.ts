@@ -26,6 +26,7 @@ export type Cart = {
   cartItems: cartItem[];
   shippingAddress: shippingAddress;
   paymentMethod: string;
+  deliverySpeed: string;
   itemsPrice: number;
   shippingPrice: number;
   taxPrice: number;

@@ -45,7 +45,7 @@ export default function ShippingAddressPage(){
             postalCode
         })
         )
-        navigate('/payment')
+        navigate('/deliveryspeed')
     }
     return(
         <div>

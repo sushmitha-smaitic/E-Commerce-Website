@@ -74,6 +74,9 @@ export class Order {
   @prop({ required: true })
   public paymentMethod!: string;
 
+  @prop({ required: true })
+  public deliverySpeed!: string;
+
   @prop()
   public paymentResult?: PaymentResult;
 
@@ -100,6 +103,18 @@ export class Order {
 
   @prop()
   public deliveredAt!: Date;
+
+  @prop({ required: true, default: false })
+  public isPacked!: boolean;
+
+  @prop()
+  public packedAt!: Date;
+
+  @prop({ required: true, default: false })
+  public isShipped!: boolean;
+
+  @prop()
+  public shippedAt!: Date;
 }
 
 export const OrderModel = getModelForClass(Order);

@@ -55,6 +55,7 @@ export default function ProductEditPage() {
     useUpdateProductMutation()
 
   const submitHandler = async (e: React.SyntheticEvent) => {
+    console.log(image);
     e.preventDefault()
     try {
       await updateProduct({

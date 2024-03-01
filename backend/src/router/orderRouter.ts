@@ -94,6 +94,7 @@ orderRouter.post(
         })),
         shippingAddress: req.body.shippingAddress,
         paymentMethod: req.body.paymentMethod,
+        deliverySpeed: req.body.deliverySpeed,
         itemsPrice: req.body.itemsPrice,
         shippingPrice: req.body.shippingPrice,
         taxPrice: req.body.taxPrice,
@@ -120,8 +121,8 @@ orderRouter.post(
       });
       const paymentIntent = await stripe.paymentIntents.create({
         amount: order.totalPrice * 100,
-        currency: "usd",
-        payment_method_types: ["card"],
+        currency: "INR",
+        payment_method_types: ["pm_card_visa"],
       });
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {

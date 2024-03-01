@@ -18,6 +18,7 @@ import AdminRoute from './components/Admin Route.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import './index.css';
 import CartPage from './pages/CartPage.tsx';
+import DeliverySpeedPage from './pages/DeliverySpeedPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import OrderHistoryPage from './pages/OrderHistoryPage.tsx';
 import OrderPage from './pages/OrderPage.tsx';
@@ -43,6 +44,7 @@ const router = createBrowserRouter(
       <Route index = {true} element={<HomePage/>}/>
       <Route path="product/:slug" element={<ProductPage/>}/>
       <Route path="/cart" element={<CartPage/>}/>
+      <Route path="/deliveryspeed" element={<DeliverySpeedPage/>}/>
       <Route path="/signin" element={<SignInPage/>}/>
       <Route path="/search" element={<SearchPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>

@@ -22,7 +22,18 @@ export default function PlaceOrderPage(){
         cart.cartItems.reduce((a,c)=>a+c.quantity*c.price,0)
     )
 
-    cart.shippingPrice=cart.itemsPrice>100?round2(0):round2(10)
+    if(cart.deliverySpeed=='Standard Delivery'){
+        cart.shippingPrice=0;
+    }else if(cart.deliverySpeed=='One Day Delivery'){
+        cart.shippingPrice=25;
+    }else if(cart.deliverySpeed=='Two Day Delivery'){
+        cart.shippingPrice=15;
+    }else {
+        cart.shippingPrice=35;
+    }
+    
+    // eslint-disable-next-line no-self-assign
+    cart.shippingPrice=cart.shippingPrice
     cart.taxPrice=round2(0.15*cart.itemsPrice)
     cart.totalPrice=cart.itemsPrice+cart.shippingPrice+cart.taxPrice
 
@@ -34,6 +45,7 @@ export default function PlaceOrderPage(){
                 orderItems:cart.cartItems,
                 shippingAddress:cart.shippingAddress,
                 paymentMethod:cart.paymentMethod,
+                deliverySpeed:cart.deliverySpeed,
                 itemsPrice:cart.itemsPrice,
                 shippingPrice:cart.shippingPrice,
                 taxPrice:cart.taxPrice,
@@ -68,11 +80,24 @@ export default function PlaceOrderPage(){
                                 Shipping
                             </Card.Title>
                             <Card.Text>
-                                <strong>Name:</strong>{cart.shippingAddress.fullName}<br/>
-                                <strong>Address:</strong>{cart.shippingAddress.address},{cart.shippingAddress.city},{cart.shippingAddress.postalCode},{cart.shippingAddress.country}<br/>
+                                <strong>Name: </strong>{cart.shippingAddress.fullName}<br/>
+                                <strong>Address: </strong>{cart.shippingAddress.address},{cart.shippingAddress.city},{cart.shippingAddress.postalCode},{cart.shippingAddress.country}<br/>
 
                             </Card.Text>
                             <Link to='/shipping'>Edit</Link>
+                        </Card.Body>
+                    </Card>
+
+                    <Card className="mb-3">
+                        <Card.Body>
+                            <Card.Title>
+                                Delivery Speed
+                            </Card.Title>
+                            <Card.Text>
+                            <strong>Delivery Speed: </strong>{cart.deliverySpeed}
+
+                            </Card.Text>
+                            <Link to='/deliveryspeed'>Edit</Link>
                         </Card.Body>
                     </Card>
                     <Card className="mb-3">
@@ -81,7 +106,7 @@ export default function PlaceOrderPage(){
                                 Payment
                             </Card.Title>
                             <Card.Text>
-                                <strong>Method:</strong>{cart.paymentMethod}
+                                <strong>Method: </strong>{cart.paymentMethod}
                             </Card.Text>
                             <Link to="/payment">Edit</Link>
                     </Card.Body>

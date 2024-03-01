@@ -28,6 +28,9 @@ const initialState: AppState = {
     paymentMethod: localStorage.getItem('paymentMethod')
                   ?localStorage.getItem('paymentMethod')!
                   :'PayPal',
+    deliverySpeed: localStorage.getItem('deliverySpeed')
+                  ?localStorage.getItem('deliverySpeed')!
+                  :'Standard Delivery',
     itemsPrice: 0,
     shippingPrice: 0,
     taxPrice: 0,
@@ -44,6 +47,7 @@ type Action =
 | {type: "USER_SIGNOUT"}
 | {type: "SAVE_SHIPPING_ADDRESS"; payload: shippingAddress}
 | {type: "SAVE_PAYMENT_METHOD"; payload: string}
+| {type: "SAVE_DELIVERY_SPEED"; payload: string}
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -98,6 +102,7 @@ function reducer(state: AppState, action: Action): AppState {
             country:'',
             
           },
+          deliverySpeed:'',
           itemsPrice:0,
           shippingPrice:0,
           taxPrice:0,
@@ -118,6 +123,12 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         cart:{
           ...state.cart, paymentMethod: action.payload},
+        }
+    case "SAVE_DELIVERY_SPEED":
+      return{
+        ...state,
+        cart:{
+          ...state.cart, deliverySpeed: action.payload},
         }
     default:
       return state;

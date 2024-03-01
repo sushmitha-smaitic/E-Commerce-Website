@@ -67,6 +67,7 @@ export const useCreateOrderMutation = () =>
       orderItems: cartItem[];
       shippingAddress: shippingAddress;
       paymentMethod: string;
+      deliverySpeed: string;
       itemsPrice: number;
       shippingPrice: number;
       taxPrice: number;
