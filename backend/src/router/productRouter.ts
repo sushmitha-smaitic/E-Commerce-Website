@@ -22,24 +22,25 @@ productRouter.get(
   })
 );
 
+// /api/produucts
 productRouter.post(
   "/",
   isAuth,
   isAdmin,
   asyncHandler(async (req: Request, res: Response) => {
     const product = await ProductModel.create({
-      name: "Sample Name" + Date.now(),
-      price: 0,
-      image: "../assets/images/p1.jpg",
-      brand: "Sample Brand",
-      slug: "sample-slug-" + Date.now(),
-      category: "sample category",
-      countInStock: 0,
-      numReviews: 0,
-      maxQuantity: 0,
-      rating: 4.5,
-      discount: 10,
-      description: "Sample Description",
+      name: req.body.name,
+      price: req.body.price,
+      image: req.body.image,
+      brand: req.body.brand,
+      slug: req.body.slug + Date.now(),
+      category: req.body.category,
+      countInStock: req.body.countInStock,
+      numReviews: req.body.numReviews,
+      maxQuantity: req.body.maxQuantity,
+      rating: req.body.rating,
+      discount: req.body.discount,
+      description: req.body.description,
     } as Product);
 
     const createdProduct = await product.save();

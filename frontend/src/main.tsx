@@ -30,6 +30,7 @@ import SearchPage from './pages/SearchPage.tsx';
 import ShippingAddressPage from './pages/ShippingAddressPage.tsx';
 import SignInPage from './pages/SignInPage.tsx';
 import SignupPage from './pages/SignUpPage';
+import CreateProductPage from './pages/admin/CreateProductPage.tsx';
 import DashboardPage from './pages/admin/DashboardPage.tsx';
 import OrderListPage from './pages/admin/OrderListPage.tsx';
 import ProductEditPage from './pages/admin/ProductEditPage.tsx';
@@ -48,6 +49,7 @@ const router = createBrowserRouter(
       <Route path="/signin" element={<SignInPage/>}/>
       <Route path="/search" element={<SearchPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>
+      
 
       {/* Normal Users */}
       <Route path='' element={<ProtectedRoute/>}>
@@ -69,6 +71,7 @@ const router = createBrowserRouter(
         <Route path="product/:id" element={<ProductEditPage />} />
         <Route path="users" element={<UserListPage />} />
         <Route path="user/:id" element={<UserEditPage />} />
+        <Route path='products/createnew' element={<CreateProductPage/>}/>
       </Route>
       {/* <Route path="dashboard" element={<Dashboard />} /> */}
       {/* ... etc. */}

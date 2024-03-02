@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 import LoadingBox from '../../components/LoadingBox'
 import MessageBox from '../../components/MessageBox'
 import {
-  useCreateProductMutation,
+  //useCreateProductMutation,
   useDeleteProductMutation,
   useGetAdminProdcutsQuery,
 } from '../../hooks/productHooks'
@@ -22,21 +22,21 @@ export default function ProductListPage() {
 
   const { data, isLoading, error, refetch } = useGetAdminProdcutsQuery(page)
 
-  const { mutateAsync: createProduct, isPending: loadingCreate } =
-    useCreateProductMutation()
+  // const { mutateAsync: createProduct, isPending: loadingCreate } =
+  //   useCreateProductMutation()
 
-  const createHandler = async () => {
-    if (window.confirm('Are you sure to create?')) {
-      try {
-        const data = await createProduct()
-        refetch()
-        toast.success('Product created successfully')
-        navigate(`/admin/product/${data.product._id}`)
-      } catch (err) {
-        toast.error(getError(err as ApiError))
-      }
-    }
-  }
+  // const createHandler = async () => {
+  //   if (window.confirm('Are you sure to create?')) {
+  //     try {
+  //       const data = await createProduct()
+  //       refetch()
+  //       toast.success('Product created successfully')
+  //       navigate(`/admin/product/${data.product._id}`)
+  //     } catch (err) {
+  //       toast.error(getError(err as ApiError))
+  //     }
+  //   }
+  // }
   const { mutateAsync: deleteProduct, isPending: loadingDelete } =
     useDeleteProductMutation()
 
@@ -60,14 +60,14 @@ export default function ProductListPage() {
         </Col>
         <Col className="col text-end">
           <div>
-            <Button type="button" onClick={createHandler}>
+            <Button type="button" onClick={()=>navigate(`/admin/products/createnew`)}>
               Create Product
             </Button>
           </div>
         </Col>
       </Row>
 
-      {loadingCreate && <LoadingBox></LoadingBox>}
+      {/* {loadingCreate && <LoadingBox></LoadingBox>} */}
       {loadingDelete && <LoadingBox></LoadingBox>}
 
       {isLoading ? (

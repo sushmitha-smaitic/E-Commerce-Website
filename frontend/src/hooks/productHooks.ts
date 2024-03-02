@@ -64,12 +64,34 @@ export const useGetCategoriesQuery = () =>
 
 export const useCreateProductMutation = () =>
   useMutation({
-    mutationFn: async () =>
+    mutationFn: async (product: {
+      //_id: string;
+      name: string;
+      slug: string;
+      price: number;
+      image: string;
+      images: string[];
+      category: string;
+      brand: string;
+      countInStock: number;
+      description: string;
+      //numReviews: number;
+      //maxQuantity: number;
+      //rating: number;
+      discount: number;
+    }) =>
       (
         await apiClient.post<{ product: Product; message: string }>(
-          `api/products`
+          `api/products`,
+          product
         )
       ).data,
+    // mutationFn: async () =>
+    //   (
+    //     await apiClient.post<{ product: Product; message: string }>(
+    //       `api/products`
+    //     )
+    //   ).data,
   });
 
 export const useDeleteProductMutation = () =>
