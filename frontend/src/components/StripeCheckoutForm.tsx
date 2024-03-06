@@ -1,7 +1,7 @@
 import {
-    CardElement,
-    useElements,
-    useStripe
+  CardElement,
+  useElements,
+  useStripe
 } from '@stripe/react-stripe-js'
 import { StripeElementsOptions } from '@stripe/stripe-js'
 import React from 'react'

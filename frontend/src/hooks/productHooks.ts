@@ -139,15 +139,11 @@ export const useUploadProductMutation = () =>
   useMutation({
     mutationFn: async (formData: FormData) =>
       (
-        await apiClient.post<{ secure_url: string }>(
-          `api/uploads/local`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        )
+        await apiClient.post<{ secure_url: string }>(`/api/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
       ).data,
   });
 

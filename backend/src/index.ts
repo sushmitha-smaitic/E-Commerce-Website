@@ -46,17 +46,18 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/products", productRouter);
-app.use("/api/uploads", uploadRouter);
+app.use("/api/upload", uploadRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/seed", seedRouter);
 app.use("/api/keys", keyRouter);
 
-app.use("/uploads", express.static(path.join(__dirname, "../../uploads")));
+//const __dirname = path.resolve();
+app.use("/upload", express.static("../../frontend/public/images"));
 
-app.use(express.static(path.join(__dirname, "../../frontend/dist")));
-app.get("*", (req: Request, res: Response) =>
-  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"))
+app.use(express.static(path.join(__dirname, "../../frontend")));
+app.get("/", (req: Request, res: Response) =>
+  res.sendFile(path.join(__dirname, "../../frontend/index.html"))
 );
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

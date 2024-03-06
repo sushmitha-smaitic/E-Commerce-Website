@@ -116,7 +116,7 @@ export default function OrderPage() {
             type: 'resetOptions',
             value: {
               'clientId': data!.clientId,
-              currency: 'INR',
+              currency: 'usd',
             },
           })
           paypalDispatch({

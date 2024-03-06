@@ -121,8 +121,8 @@ orderRouter.post(
       });
       const paymentIntent = await stripe.paymentIntents.create({
         amount: order.totalPrice * 100,
-        currency: "INR",
-        payment_method_types: ["pm_card_visa"],
+        currency: "USD",
+        payment_method_types: ["card"],
       });
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {

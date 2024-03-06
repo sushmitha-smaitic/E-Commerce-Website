@@ -80,27 +80,46 @@ export default function ProductEditPage() {
   const { mutateAsync: uploadProduct, isPending: loadingUpload } =
     useUploadProductMutation()
 
-  const uploadFileHandler = async (
-    e: React.FormEvent<HTMLInputElement>,
-    forImages: boolean = false
-  ) => {
-    const file = e.currentTarget.files![0]
-    const bodyFormData = new FormData()
-    bodyFormData.append('image', file)
-
-    try {
-      const data = await uploadProduct(bodyFormData)
-
-      if (forImages) {
-        setImages([...images, data.secure_url])
-      } else {
-        setImage(data.secure_url)
-      }
-      toast.success('Image uploaded successfully. click Update to apply it')
-    } catch (err) {
-      toast.error(getError(err as ApiError))
-    }
+  const uploadFileHandler: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+  const inputElement = event.currentTarget;
+  const files = inputElement.files;
+    
+  if (!files || files.length === 0) {
+    console.log("No files selected");
+    return;
   }
+    
+  // Access the files and do something with them
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    console.log("File name:", file.name);
+    console.log("File type:", file.type);
+    console.log("File size:", file.size, "bytes");
+  }
+}
+    
+
+  // const uploadFileHandler = async (
+  //   e: React.FormEvent<HTMLInputElement>,
+  //   forImages: boolean = false
+  // ) => {
+  //   const file = e.currentTarget.files![0]
+  //   const bodyFormData = new FormData()
+  //   bodyFormData.append('image', file)
+
+  //   try {
+  //     const data = await uploadProduct(bodyFormData)
+
+  //     if (forImages) {
+  //       setImages([...images, data.secure_url])
+  //     } else {
+  //       setImage(data.secure_url)
+  //     }
+  //     toast.success('Image uploaded successfully. click Update to apply it')
+  //   } catch (err) {
+  //     toast.error(getError(err as ApiError))
+  //   }
+  // }
 
   const deleteFileHandler = async (fileName: string) => {
     setImages(images.filter((x) => x !== fileName))
@@ -146,14 +165,16 @@ export default function ProductEditPage() {
           <Form.Group className="mb-3" controlId="image">
             <Form.Label>Image File</Form.Label>
             <Form.Control
+              type='text'
+              placeholder='Enter image url'
               value={image}
               onChange={(e) => setImage(e.target.value)}
-              required
+              //required
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="imageFile">
             <Form.Label>Upload Image</Form.Label>
-            <input type="file" onChange={uploadFileHandler}></input>
+            <Form.Control aria-label='Choose file' type="file" onChange={uploadFileHandler}></Form.Control>
             {loadingUpload && <LoadingBox></LoadingBox>}
           </Form.Group>
 
@@ -176,7 +197,7 @@ export default function ProductEditPage() {
 
             <input
               type="file"
-              onChange={(e) => uploadFileHandler(e, true)}
+              onChange= {uploadFileHandler}
             ></input>
 
             {loadingUpload && <LoadingBox></LoadingBox>}
