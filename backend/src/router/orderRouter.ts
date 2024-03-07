@@ -121,7 +121,7 @@ orderRouter.post(
       });
       const paymentIntent = await stripe.paymentIntents.create({
         amount: order.totalPrice * 100,
-        currency: "USD",
+        currency: "inr",
         payment_method_types: ["card"],
       });
       res.json({ clientSecret: paymentIntent.client_secret });
@@ -178,6 +178,50 @@ orderRouter.put(
       res.status(200).send({
         order: updatedOrder,
         message: "Order Delivered Successfully",
+      });
+    } else {
+      res.status(404).json({ message: "Order Not Found" });
+    }
+  })
+);
+
+orderRouter.put(
+  "/:id/shipped",
+  isAuth,
+  isAdmin,
+  asyncHandler(async (req: Request, res: Response) => {
+    const order = await OrderModel.findById(req.params.id);
+
+    if (order) {
+      order.isShipped = true;
+      order.shippedAt = new Date(Date.now());
+      const updatedOrder = await order.save();
+
+      res.status(200).send({
+        order: updatedOrder,
+        message: "Order is Shipped",
+      });
+    } else {
+      res.status(404).json({ message: "Order Not Found" });
+    }
+  })
+);
+
+orderRouter.put(
+  "/:id/packed",
+  isAuth,
+  isAdmin,
+  asyncHandler(async (req: Request, res: Response) => {
+    const order = await OrderModel.findById(req.params.id);
+
+    if (order) {
+      order.isPacked = true;
+      order.packedAt = new Date(Date.now());
+      const updatedOrder = await order.save();
+
+      res.status(200).send({
+        order: updatedOrder,
+        message: "Order is Packaged",
       });
     } else {
       res.status(404).json({ message: "Order Not Found" });

@@ -91,6 +91,26 @@ export const useDeliverOrderMutation = () =>
       ).data,
   });
 
+export const useShippedOrderMutation = () =>
+  useMutation({
+    mutationFn: async (orderId: string) =>
+      (
+        await apiClient.put<{ message: string; order: Order }>(
+          `api/orders/${orderId}/shipped`
+        )
+      ).data,
+  });
+
+export const usePackedOrderMutation = () =>
+  useMutation({
+    mutationFn: async (orderId: string) =>
+      (
+        await apiClient.put<{ message: string; order: Order }>(
+          `api/orders/${orderId}/packed`
+        )
+      ).data,
+  });
+
 export const useGetStripePublishableKeyQuery = () =>
   useQuery({
     queryKey: ["stripe-publishable-key"],

@@ -25,7 +25,9 @@ import {
   useGetOrderDetailsQuery,
   useGetPaypalClientIdQuery,
   useGetStripePublishableKeyQuery,
+  usePackedOrderMutation,
   usePayOrderMutation,
+  useShippedOrderMutation,
 } from '../hooks/orderHooks'
 import { ApiError } from '../types/ApiError'
 import { getError } from '../utils'
@@ -47,6 +49,12 @@ export default function OrderPage() {
     refetch,
   } = useGetOrderDetailsQuery(orderId!)
 
+  const { mutateAsync: packOrder, isPending: loadingPacked } =
+    usePackedOrderMutation()
+
+  const { mutateAsync: shipOrder, isPending: loadingShipped } =
+    useShippedOrderMutation()
+
   const { mutateAsync: deliverOrder, isPending: loadingDeliver } =
     useDeliverOrderMutation()
 
@@ -55,6 +63,26 @@ export default function OrderPage() {
       await deliverOrder(orderId!)
       refetch()
       toast.success('Order is delivered')
+    } catch (err) {
+      toast.error(getError(err as ApiError))
+    }
+  }
+
+  async function shipOrderHandler() {
+    try {
+      await shipOrder(orderId!)
+      refetch()
+      toast.success('Order is shipped')
+    } catch (err) {
+      toast.error(getError(err as ApiError))
+    }
+  }
+
+  async function packOrderHandler() {
+    try {
+      await packOrder(orderId!)
+      refetch()
+      toast.success('Order is packed')
     } catch (err) {
       toast.error(getError(err as ApiError))
     }
@@ -156,16 +184,20 @@ export default function OrderPage() {
                 {order.shippingAddress.city}, {order.shippingAddress.postalCode}
                 ,{order.shippingAddress.country}
                 &nbsp;
-                {/* {order.shippingAddress.location &&
-                  order.shippingAddress.location.lat && (
-                    <a
-                      target="_new"
-                      href={`https://maps.google.com?q=${order.shippingAddress.location.lat},${order.shippingAddress.location.lng}`}
-                    >
-                      Show On Map
-                    </a>
-                  )} */}
               </Card.Text>
+              {order.isPacked ?(
+                  <MessageBox variant="success">
+                    Packed at {order.packedAt}
+                  </MessageBox>):(
+                    <MessageBox variant="warning">Not Yet Packed</MessageBox>
+              )}
+              {order.isShipped ?(
+                  <MessageBox variant="success">
+                    Shipped at {order.shippedAt}
+                  </MessageBox>
+                  ):(
+                    <MessageBox variant="warning">Not Yet Shipped</MessageBox>
+              )}
               {order.isDelivered ? (
                 <MessageBox variant="success">
                   Delivered at {order.deliveredAt}
@@ -285,7 +317,27 @@ export default function OrderPage() {
                     )}
                   </ListGroup.Item>
                 )}
-                {userInfo!.isAdmin && order.isPaid && !order.isDelivered && (
+                {userInfo!.isAdmin && order.isPaid && !order.isPacked && (
+                  <ListGroup.Item>
+                    {loadingPacked && <LoadingBox></LoadingBox>}
+                    <div className="d-grid">
+                      <Button type="button" onClick={packOrderHandler}>
+                        Pack Order
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                )}
+                {userInfo!.isAdmin && order.isPaid && order.isPacked && !order.isShipped && (
+                  <ListGroup.Item>
+                    {loadingShipped && <LoadingBox></LoadingBox>}
+                    <div className="d-grid">
+                      <Button type="button" onClick={shipOrderHandler}>
+                        Ship Order
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                )}
+                {userInfo!.isAdmin && order.isPaid && order.isPacked && order.isShipped && !order.isDelivered && (
                   <ListGroup.Item>
                     {loadingDeliver && <LoadingBox></LoadingBox>}
                     <div className="d-grid">

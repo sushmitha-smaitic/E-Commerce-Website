@@ -9,9 +9,9 @@ import { toast } from 'react-toastify'
 import LoadingBox from '../../components/LoadingBox'
 import MessageBox from '../../components/MessageBox'
 import {
-    useCreateProductMutation,
-    //useGetProductDetailsQuery,
-    useUploadProductMutation,
+  useCreateProductMutation,
+  //useGetProductDetailsQuery,
+  useUploadProductMutation,
 } from '../../hooks/productHooks'
 import { ApiError } from '../../types/ApiError'
 import { getError } from '../../utils'
@@ -191,8 +191,8 @@ export default function CreateProductPage() {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-            />
-          </Form.Group>
+            /> 
+              </Form.Group>
           <Form.Group className="mb-3" controlId="brand">
             <Form.Label>Brand</Form.Label>
             <Form.Control
