@@ -13,7 +13,7 @@ import Col from 'react-bootstrap/Col'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Row from 'react-bootstrap/Row'
 import { Helmet } from 'react-helmet-async'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { Store } from '../Store'
 import LoadingBox from '../components/LoadingBox'
@@ -57,6 +57,11 @@ export default function OrderPage() {
 
   const { mutateAsync: deliverOrder, isPending: loadingDeliver } =
     useDeliverOrderMutation()
+
+  const navigate=useNavigate();
+  async function returnHandler() {
+    navigate(`/order/${orderId}/return`)
+  }
 
   async function deliverOrderHandler() {
     try {
@@ -243,6 +248,7 @@ export default function OrderPage() {
                       </Col>
                       <Col md={3}><span>&#8377;</span>{item.price}</Col>
                     </Row>
+                    <div><button className='btn btn-primary' type='button' onClick={returnHandler}>Return</button></div>
                   </ListGroup.Item>
                 ))}
               </ListGroup>

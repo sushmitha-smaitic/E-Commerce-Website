@@ -33,7 +33,7 @@ export default function SignInPage(){
             dispatch({type: 'USER_SIGNIN', payload: data})
             localStorage.setItem('userInfo',JSON.stringify(data))
             navigate(redirect || '/')
-        } catch (err) {
+            } catch (err) {
             toast.error(getError(err as ApiError))
         }
     }

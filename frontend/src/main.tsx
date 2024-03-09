@@ -10,7 +10,7 @@ import {
   Route,
   RouterProvider,
   createBrowserRouter,
-  createRoutesFromElements,
+  createRoutesFromElements
 } from "react-router-dom";
 import App from './App.tsx';
 import { StoreProvider } from './Store.tsx';
@@ -22,6 +22,7 @@ import DeliverySpeedPage from './pages/DeliverySpeedPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import OrderHistoryPage from './pages/OrderHistoryPage.tsx';
 import OrderPage from './pages/OrderPage.tsx';
+import OrderReturnPage from './pages/OrderReturnPage.tsx';
 import PaymentMethodPage from './pages/PaymentMethodPage.tsx';
 import PlaceOrderPage from './pages/PlaceOrder.tsx';
 import ProductPage from './pages/ProductPage.tsx';
@@ -50,17 +51,15 @@ const router = createBrowserRouter(
       <Route path="/search" element={<SearchPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>
       
-
       {/* Normal Users */}
       <Route path='' element={<ProtectedRoute/>}>
-        {/* <Route path='/admin' element={<AdminRoute/>}/> */}
         <Route path='/shipping' element={<ShippingAddressPage/>}/>
         <Route path='/payment' element={<PaymentMethodPage/>}/>
         <Route path='/placeorder' element={<PlaceOrderPage/>}/>
         <Route path='/order/:id' element={<OrderPage/>}/>
         <Route path='/orderhistory' element={<OrderHistoryPage/>}/>
         <Route path="/profile" element={<ProfilePage/>} />
-
+        <Route path='/order/:id/return' element={<OrderReturnPage/>}/>
       </Route>
 
       {/* Admin Users */}

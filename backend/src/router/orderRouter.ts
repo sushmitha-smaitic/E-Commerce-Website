@@ -8,6 +8,7 @@ import { isAdmin, isAuth } from "../utils";
 
 export const orderRouter = express.Router();
 
+// Get my orders
 orderRouter.get(
   "/mine",
   isAuth,
@@ -17,11 +18,13 @@ orderRouter.get(
   })
 );
 
+// Get all orders for admins
 orderRouter.get("/", isAuth, isAdmin, async (req, res) => {
   const orders = await OrderModel.find().populate("user", "name");
   res.status(200).send(orders);
 });
 
+// Get List of all orders for admin
 orderRouter.get(
   "/summary",
   isAuth,
@@ -66,6 +69,7 @@ orderRouter.get(
   })
 );
 
+// Get One order by id
 orderRouter.get(
   // /api/orders/:id
   "/:id",
@@ -80,6 +84,7 @@ orderRouter.get(
   })
 );
 
+// create order
 orderRouter.post(
   "/",
   isAuth,
@@ -107,6 +112,7 @@ orderRouter.post(
   })
 );
 
+// pay order by stripe
 orderRouter.post(
   "/:id/stripe-payment-intent",
   asyncHandler(async (req, res) => {
@@ -131,6 +137,7 @@ orderRouter.post(
   })
 );
 
+// Mark as paid
 orderRouter.put(
   "/:id/pay",
   isAuth,
@@ -164,6 +171,7 @@ orderRouter.put(
   })
 );
 
+// mark as delivered
 orderRouter.put(
   "/:id/deliver",
   isAuth,
@@ -185,6 +193,7 @@ orderRouter.put(
   })
 );
 
+// mark as shipped
 orderRouter.put(
   "/:id/shipped",
   isAuth,
@@ -207,6 +216,7 @@ orderRouter.put(
   })
 );
 
+// mark as packed
 orderRouter.put(
   "/:id/packed",
   isAuth,
@@ -229,6 +239,7 @@ orderRouter.put(
   })
 );
 
+// delete order
 orderRouter.delete("/:id", isAuth, isAdmin, async (req, res) => {
   const order = await OrderModel.findOne({ _id: req.params.id });
   if (order) {
