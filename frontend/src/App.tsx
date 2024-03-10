@@ -1,49 +1,48 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Container,
   ListGroup,
   Nav,
   NavDropdown,
-  Navbar
-} from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
-import { Link, Outlet } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-import { Store } from './Store'
-import LoadingBox from './components/LoadingBox'
-import MessageBox from './components/MessageBox'
-import SearchBox from './components/SearchBox'
-import { useGetCategoriesQuery } from './hooks/productHooks'
-import { ApiError } from './types/ApiError'
-import { getError } from './utils'
+  Navbar,
+} from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import { Link, Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Store } from "./Store";
+import LoadingBox from "./components/LoadingBox";
+import MessageBox from "./components/MessageBox";
+import SearchBox from "./components/SearchBox";
+import { useGetCategoriesQuery } from "./hooks/productHooks";
+import { ApiError } from "./types/ApiError";
+import { getError } from "./utils";
 
 function App() {
   const {
     state: { mode, cart, userInfo },
     dispatch,
-  } = useContext(Store)
+  } = useContext(Store);
 
   useEffect(() => {
-    document.body.setAttribute('data-bs-theme', mode)
-  }, [mode])
+    document.body.setAttribute("data-bs-theme", mode);
+  }, [mode]);
 
   const switchModeHandler = () => {
-    dispatch({ type: 'SWITCH_MODE' })
-  }
+    dispatch({ type: "SWITCH_MODE" });
+  };
   const signoutHandler = () => {
-    dispatch({ type: 'USER_SIGNOUT' })
-    localStorage.removeItem('userInfo')
-    localStorage.removeItem('cartItems')
-    localStorage.removeItem('shippingAddress')
-    localStorage.removeItem('paymentMethod')
-    window.location.href = '/signin'
-  }
+    dispatch({ type: "USER_SIGNOUT" });
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("shippingAddress");
+    localStorage.removeItem("paymentMethod");
+    window.location.href = "/signin";
+  };
 
-  const [sidebarIsOpen, setSidebarIsOpen] = useState(false)
-  const { data: categories, isLoading, error } = useGetCategoriesQuery()
-
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+  const { data: categories, isLoading, error } = useGetCategoriesQuery();
 
   return (
     <div className="d-flex flex-column vh-100">
@@ -69,9 +68,9 @@ function App() {
                   onClick={switchModeHandler}
                 >
                   <i
-                    className={mode === 'light' ? 'fa fa-sun' : 'fa fa-moon'}
-                  ></i>{' '}
-                  {mode === 'light' ? 'Light' : 'Dark'}
+                    className={mode === "light" ? "fa fa-sun" : "fa fa-moon"}
+                  ></i>{" "}
+                  {mode === "light" ? "Light" : "Dark"}
                 </Link>
 
                 {userInfo ? (
@@ -91,8 +90,8 @@ function App() {
                       to="#signout"
                       onClick={signoutHandler}
                     >
-                      {' '}
-                      Sign Out{' '}
+                      {" "}
+                      Sign Out{" "}
                     </Link>
                   </NavDropdown>
                 ) : (
@@ -103,17 +102,21 @@ function App() {
                   </NavDropdown>
                 )}
                 {userInfo && userInfo.isAdmin && (
-                  <NavDropdown className="header-link" title="Admin" id='admin-nav-dropdown'>
-                    <LinkContainer to='/admin/dashboard'>
+                  <NavDropdown
+                    className="header-link"
+                    title="Admin"
+                    id="admin-nav-dropdown"
+                  >
+                    <LinkContainer to="/admin/dashboard">
                       <NavDropdown.Item>Dashboard</NavDropdown.Item>
                     </LinkContainer>
-                    <LinkContainer to='/admin/products'>
+                    <LinkContainer to="/admin/products">
                       <NavDropdown.Item>Products</NavDropdown.Item>
                     </LinkContainer>
-                    <LinkContainer to='/admin/orders'>
+                    <LinkContainer to="/admin/orders">
                       <NavDropdown.Item>Orders</NavDropdown.Item>
                     </LinkContainer>
-                    <LinkContainer to='/admin/users'>
+                    <LinkContainer to="/admin/users">
                       <NavDropdown.Item>Users</NavDropdown.Item>
                     </LinkContainer>
                   </NavDropdown>
@@ -164,8 +167,8 @@ function App() {
       <div
         className={
           sidebarIsOpen
-            ? 'active-nav side-navbar d-flex justify-content-between flex-wrap flex-column'
-            : 'side-navbar d-flex justify-content-between flex-wrap flex-column'
+            ? "active-nav side-navbar d-flex justify-content-between flex-wrap flex-column"
+            : "side-navbar d-flex justify-content-between flex-wrap flex-column"
         }
       >
         <ListGroup variant="flush">
@@ -190,7 +193,7 @@ function App() {
               </Button>
             </div>
           </ListGroup.Item>
-         {isLoading ? (
+          {isLoading ? (
             <LoadingBox />
           ) : error ? (
             <MessageBox variant="danger">
@@ -200,14 +203,14 @@ function App() {
             categories!.map((category) => (
               <ListGroup.Item action key={category}>
                 <LinkContainer
-                  to={{ pathname: '/search', search: `category=${category}` }}
+                  to={{ pathname: "/search", search: `category=${category}` }}
                   onClick={() => setSidebarIsOpen(false)}
                 >
                   <Nav.Link>{category}</Nav.Link>
                 </LinkContainer>
-              </ListGroup.Item> 
+              </ListGroup.Item>
             ))
-            )} 
+          )}
         </ListGroup>
       </div>
 
@@ -220,7 +223,7 @@ function App() {
         <div className="text-center">All rights reserved</div>
       </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

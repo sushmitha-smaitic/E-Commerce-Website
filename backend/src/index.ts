@@ -53,11 +53,11 @@ app.use("/api/seed", seedRouter);
 app.use("/api/keys", keyRouter);
 
 //const __dirname = path.resolve();
-app.use("/upload", express.static("../../frontend/public/images"));
+app.use("/upload", express.static("../../uploads"));
 
-app.use(express.static(path.join(__dirname, "../../frontend")));
-app.get("/", (req: Request, res: Response) =>
-  res.sendFile(path.join(__dirname, "../../frontend/index.html"))
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+app.get("*", (req: Request, res: Response) =>
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"))
 );
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -65,7 +65,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-const PORT = 4000;
+const PORT: number = parseInt((process.env.PORT || "4000") as string, 10);
+
 app.listen(PORT, () => {
   console.log(`Server started at http://localhost:${PORT}`);
 });

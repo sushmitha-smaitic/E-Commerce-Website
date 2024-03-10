@@ -1,62 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import Button from 'react-bootstrap/Button'
-import Container from 'react-bootstrap/Container'
-import Form from 'react-bootstrap/Form'
-import ListGroup from 'react-bootstrap/ListGroup'
-import { Helmet } from 'react-helmet-async'
-import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'react-toastify'
-import LoadingBox from '../../components/LoadingBox'
-import MessageBox from '../../components/MessageBox'
+import React, { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import ListGroup from "react-bootstrap/ListGroup";
+import { Helmet } from "react-helmet-async";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import LoadingBox from "../../components/LoadingBox";
+import MessageBox from "../../components/MessageBox";
 import {
   useGetProductDetailsQuery,
   useUpdateProductMutation,
   useUploadProductMutation,
-} from '../../hooks/productHooks'
-import { ApiError } from '../../types/ApiError'
-import { getError } from '../../utils'
+} from "../../hooks/productHooks";
+import { ApiError } from "../../types/ApiError";
+import { getError } from "../../utils";
 
 export default function ProductEditPage() {
-  const navigate = useNavigate()
-  const params = useParams()
-  const { id: productId } = params
+  const navigate = useNavigate();
+  const params = useParams();
+  const { id: productId } = params;
 
-  const [name, setName] = useState('')
-  const [slug, setSlug] = useState('')
-  const [price, setPrice] = useState(0)
-  const [image, setImage] = useState('')
-  const [images, setImages] = useState<string[]>([])
-  const [category, setCategory] = useState('')
-  const [countInStock, setCountInStock] = useState(0)
-  const [brand, setBrand] = useState('')
-  const [description, setDescription] = useState('')
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [price, setPrice] = useState(0);
+  const [image, setImage] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [category, setCategory] = useState("");
+  const [countInStock, setCountInStock] = useState(0);
+  const [brand, setBrand] = useState("");
+  const [description, setDescription] = useState("");
 
   const {
     data: product,
     isLoading,
     error,
-  } = useGetProductDetailsQuery(productId!)
+  } = useGetProductDetailsQuery(productId!);
 
   useEffect(() => {
     if (product) {
-      setName(product.name)
-      setSlug(product.slug)
-      setPrice(product.price)
-      setImage(product.image)
-      setImages(product.images)
-      setCategory(product.category)
-      setCountInStock(product.countInStock)
-      setBrand(product.brand)
-      setDescription(product.description)
+      setName(product.name);
+      setSlug(product.slug);
+      setPrice(product.price);
+      setImage(product.image);
+      setImages(product.images);
+      setCategory(product.category);
+      setCountInStock(product.countInStock);
+      setBrand(product.brand);
+      setDescription(product.description);
     }
-  }, [product])
+  }, [product]);
 
   const { mutateAsync: updateProduct, isPending: loadingUpdate } =
-    useUpdateProductMutation()
+    useUpdateProductMutation();
 
   const submitHandler = async (e: React.SyntheticEvent) => {
-    console.log(image);
-    e.preventDefault()
+    e.preventDefault();
     try {
       await updateProduct({
         _id: productId!,
@@ -69,62 +68,43 @@ export default function ProductEditPage() {
         brand,
         countInStock,
         description,
-      })
-      toast.success('Product updated successfully')
-      navigate('/admin/products')
+      });
+      toast.success("Product updated successfully");
+      navigate("/admin/products");
     } catch (err) {
-      toast.error(getError(err as ApiError))
+      toast.error(getError(err as ApiError));
     }
-  }
+  };
 
   const { mutateAsync: uploadProduct, isPending: loadingUpload } =
-    useUploadProductMutation()
+    useUploadProductMutation();
 
-  const uploadFileHandler: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
-  const inputElement = event.currentTarget;
-  const files = inputElement.files;
-    
-  if (!files || files.length === 0) {
-    console.log("No files selected");
-    return;
-  }
-    
-  // Access the files and do something with them
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    console.log("File name:", file.name);
-    console.log("File type:", file.type);
-    console.log("File size:", file.size, "bytes");
-  }
-}
-    
+  const uploadFileHandler = async (
+    e: React.FormEvent<HTMLInputElement>,
+    forImages: boolean = false
+  ) => {
+    const file = e.currentTarget.files![0];
+    const bodyFormData = new FormData();
+    bodyFormData.append("image", file);
 
-  // const uploadFileHandler = async (
-  //   e: React.FormEvent<HTMLInputElement>,
-  //   forImages: boolean = false
-  // ) => {
-  //   const file = e.currentTarget.files![0]
-  //   const bodyFormData = new FormData()
-  //   bodyFormData.append('image', file)
+    try {
+      const data = await uploadProduct(bodyFormData);
 
-  //   try {
-  //     const data = await uploadProduct(bodyFormData)
-
-  //     if (forImages) {
-  //       setImages([...images, data.secure_url])
-  //     } else {
-  //       setImage(data.secure_url)
-  //     }
-  //     toast.success('Image uploaded successfully. click Update to apply it')
-  //   } catch (err) {
-  //     toast.error(getError(err as ApiError))
-  //   }
-  // }
+      if (forImages) {
+        setImages([...images, data.secure_url]);
+      } else {
+        setImage(data.secure_url);
+      }
+      toast.success("Image uploaded successfully. click Update to apply it");
+    } catch (err) {
+      toast.error(getError(err as ApiError));
+    }
+  };
 
   const deleteFileHandler = async (fileName: string) => {
-    setImages(images.filter((x) => x !== fileName))
-    toast.success('Image removed successfully. click Update to apply it')
-  }
+    setImages(images.filter((x) => x !== fileName));
+    toast.success("Image removed successfully. click Update to apply it");
+  };
   return (
     <Container className="small-container">
       <Helmet>
@@ -135,7 +115,9 @@ export default function ProductEditPage() {
       {isLoading ? (
         <LoadingBox></LoadingBox>
       ) : error ? (
-        <MessageBox variant="danger">{getError(error as unknown  as ApiError)}</MessageBox>
+        <MessageBox variant="danger">
+          {getError(error as unknown as ApiError)}
+        </MessageBox>
       ) : (
         <Form onSubmit={submitHandler}>
           <Form.Group className="mb-3" controlId="name">
@@ -165,16 +147,14 @@ export default function ProductEditPage() {
           <Form.Group className="mb-3" controlId="image">
             <Form.Label>Image File</Form.Label>
             <Form.Control
-              type='text'
-              placeholder='Enter image url'
               value={image}
               onChange={(e) => setImage(e.target.value)}
-              //required
+              required
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="imageFile">
             <Form.Label>Upload Image</Form.Label>
-            <Form.Control aria-label='Choose file' type="file" onChange={uploadFileHandler}></Form.Control>
+            <input type="file" onChange={uploadFileHandler}></input>
             {loadingUpload && <LoadingBox></LoadingBox>}
           </Form.Group>
 
@@ -197,7 +177,7 @@ export default function ProductEditPage() {
 
             <input
               type="file"
-              onChange= {uploadFileHandler}
+              onChange={(e) => uploadFileHandler(e, true)}
             ></input>
 
             {loadingUpload && <LoadingBox></LoadingBox>}
@@ -244,5 +224,5 @@ export default function ProductEditPage() {
         </Form>
       )}
     </Container>
-  )
+  );
 }

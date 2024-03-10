@@ -3,22 +3,22 @@ import {
   PayPalButtonsComponentProps,
   SCRIPT_LOADING_STATE,
   usePayPalScriptReducer,
-} from '@paypal/react-paypal-js'
-import { Elements } from '@stripe/react-stripe-js'
-import { Stripe, StripeElementsOptions, loadStripe } from '@stripe/stripe-js'
-import { useContext, useEffect, useState } from 'react'
-import Button from 'react-bootstrap/Button'
-import Card from 'react-bootstrap/Card'
-import Col from 'react-bootstrap/Col'
-import ListGroup from 'react-bootstrap/ListGroup'
-import Row from 'react-bootstrap/Row'
-import { Helmet } from 'react-helmet-async'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'react-toastify'
-import { Store } from '../Store'
-import LoadingBox from '../components/LoadingBox'
-import MessageBox from '../components/MessageBox'
-import StripeCheckoutForm from '../components/StripeCheckoutForm'
+} from "@paypal/react-paypal-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { Stripe, StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
+import { useContext, useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import ListGroup from "react-bootstrap/ListGroup";
+import Row from "react-bootstrap/Row";
+import { Helmet } from "react-helmet-async";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Store } from "../Store";
+import LoadingBox from "../components/LoadingBox";
+import MessageBox from "../components/MessageBox";
+import StripeCheckoutForm from "../components/StripeCheckoutForm";
 import {
   useCreateStripePaymentIntentMutation,
   useDeliverOrderMutation,
@@ -28,79 +28,79 @@ import {
   usePackedOrderMutation,
   usePayOrderMutation,
   useShippedOrderMutation,
-} from '../hooks/orderHooks'
-import { ApiError } from '../types/ApiError'
-import { getError } from '../utils'
+} from "../hooks/orderHooks";
+import { ApiError } from "../types/ApiError";
+import { getError } from "../utils";
 
 export default function OrderPage() {
-  const { state } = useContext(Store)
+  const { state } = useContext(Store);
   const {
     userInfo,
     cart: { paymentMethod },
-  } = state
+  } = state;
 
-  const params = useParams()
-  const { id: orderId } = params
+  const params = useParams();
+  const { id: orderId } = params;
 
   const {
     data: order,
     isLoading,
     error,
     refetch,
-  } = useGetOrderDetailsQuery(orderId!)
+  } = useGetOrderDetailsQuery(orderId!);
 
   const { mutateAsync: packOrder, isPending: loadingPacked } =
-    usePackedOrderMutation()
+    usePackedOrderMutation();
 
   const { mutateAsync: shipOrder, isPending: loadingShipped } =
-    useShippedOrderMutation()
+    useShippedOrderMutation();
 
   const { mutateAsync: deliverOrder, isPending: loadingDeliver } =
-    useDeliverOrderMutation()
+    useDeliverOrderMutation();
 
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   async function returnHandler() {
-    navigate(`/order/${orderId}/return`)
+    navigate(`/order/${orderId}/return`);
   }
 
   async function deliverOrderHandler() {
     try {
-      await deliverOrder(orderId!)
-      refetch()
-      toast.success('Order is delivered')
+      await deliverOrder(orderId!);
+      refetch();
+      toast.success("Order is delivered");
     } catch (err) {
-      toast.error(getError(err as ApiError))
+      toast.error(getError(err as ApiError));
     }
   }
 
   async function shipOrderHandler() {
     try {
-      await shipOrder(orderId!)
-      refetch()
-      toast.success('Order is shipped')
+      await shipOrder(orderId!);
+      refetch();
+      toast.success("Order is shipped");
     } catch (err) {
-      toast.error(getError(err as ApiError))
+      toast.error(getError(err as ApiError));
     }
   }
 
   async function packOrderHandler() {
     try {
-      await packOrder(orderId!)
-      refetch()
-      toast.success('Order is packed')
+      await packOrder(orderId!);
+      refetch();
+      toast.success("Order is packed");
     } catch (err) {
-      toast.error(getError(err as ApiError))
+      toast.error(getError(err as ApiError));
     }
   }
 
   const testPayHandler = async () => {
-    await payOrder({ orderId: orderId! })
-    refetch()
-    toast.success('Order is paid')
-  }
+    await payOrder({ orderId: orderId! });
+    refetch();
+    toast.success("Order is paid");
+  };
   const paypalbuttonTransactionProps: PayPalButtonsComponentProps = {
-    style: { layout: 'vertical' },
-    createOrder(data, actions) {
+    style: { layout: "vertical" },
+    async createOrder(data, actions) {
       return actions.order
         .create({
           purchase_units: [
@@ -112,66 +112,69 @@ export default function OrderPage() {
           ],
         })
         .then((orderID: string) => {
-          return orderID
-        })
+          return orderID;
+        });
     },
-    onApprove(data, actions) {
+    async onApprove(data, actions) {
       return actions.order!.capture().then(async (details) => {
         try {
-          payOrder({ orderId: orderId!, ...details })
-          refetch()
-          toast.success('Order is paid')
+          payOrder({ orderId: orderId!, ...details });
+          refetch();
+          toast.success("Order is paid");
         } catch (err) {
-          toast.error(getError(err as ApiError))
+          toast.error(getError(err as ApiError));
         }
-      })
+      });
     },
     onError: (err) => {
-      toast.error(getError(err as ApiError))
+      toast.error(getError(err as ApiError));
     },
-  }
-  const [{ isPending, isRejected }, paypalDispatch] = usePayPalScriptReducer()
-  const { refetch: fetchPayPalClientId } = useGetPaypalClientIdQuery()
+  };
+  const [{ isPending, isRejected }, paypalDispatch] = usePayPalScriptReducer();
+  const { refetch: fetchPayPalClientId } = useGetPaypalClientIdQuery();
   const { refetch: fetchStripePublishableKey } =
-    useGetStripePublishableKeyQuery()
-  const { mutateAsync: createIntent } = useCreateStripePaymentIntentMutation()
+    useGetStripePublishableKeyQuery();
+  const { mutateAsync: createIntent } = useCreateStripePaymentIntentMutation();
   const [stripePromise, setStripePromise] =
-    useState<PromiseLike<Stripe | null> | null>(null)
+    useState<PromiseLike<Stripe | null> | null>(null);
   const [stripeOptions, setStripeOptions] = useState<StripeElementsOptions>({
-    clientSecret: '',
-  })
+    clientSecret: "",
+  });
   useEffect(() => {
     const loadScript = async () => {
       if (order) {
-        if (paymentMethod === 'PayPal') {
-          const { data } = await fetchPayPalClientId()
+        if (paymentMethod === "PayPal") {
+          const { data } = await fetchPayPalClientId();
           paypalDispatch({
-            type: 'resetOptions',
+            type: "resetOptions",
             value: {
-              'clientId': data!.clientId,
-              currency: 'usd',
+              clientId: data!.clientId,
+              currency: "usd",
             },
-          })
+          });
           paypalDispatch({
-            type: 'setLoadingStatus',
+            type: "setLoadingStatus",
             value: SCRIPT_LOADING_STATE.PENDING,
-          })
-        } else if (paymentMethod === 'Stripe') {
-          const paymentIntent = await createIntent(orderId!)
-          setStripeOptions({ clientSecret: paymentIntent.clientSecret })
-          const { data } = await fetchStripePublishableKey()
-          setStripePromise(loadStripe(data!.key))
+          });
+        } else if (paymentMethod === "Stripe") {
+          const paymentIntent = await createIntent(orderId!);
+          setStripeOptions({ clientSecret: paymentIntent.clientSecret });
+          const { data } = await fetchStripePublishableKey();
+          setStripePromise(loadStripe(data!.key));
         }
       }
-    }
-    loadScript()
-  }, [order])
-  const { mutateAsync: payOrder, isPending: loadingPay } = usePayOrderMutation()
+    };
+    loadScript();
+  }, [order]);
+  const { mutateAsync: payOrder, isPending: loadingPay } =
+    usePayOrderMutation();
 
   return isLoading ? (
     <LoadingBox></LoadingBox>
   ) : error ? (
-    <MessageBox variant="danger">{getError(error as unknown as ApiError)}</MessageBox>
+    <MessageBox variant="danger">
+      {getError(error as unknown as ApiError)}
+    </MessageBox>
   ) : order ? (
     <div>
       <Helmet>
@@ -190,18 +193,19 @@ export default function OrderPage() {
                 ,{order.shippingAddress.country}
                 &nbsp;
               </Card.Text>
-              {order.isPacked ?(
-                  <MessageBox variant="success">
-                    Packed at {order.packedAt}
-                  </MessageBox>):(
-                    <MessageBox variant="warning">Not Yet Packed</MessageBox>
+              {order.isPacked ? (
+                <MessageBox variant="success">
+                  Packed at {order.packedAt}
+                </MessageBox>
+              ) : (
+                <MessageBox variant="warning">Not Yet Packed</MessageBox>
               )}
-              {order.isShipped ?(
-                  <MessageBox variant="success">
-                    Shipped at {order.shippedAt}
-                  </MessageBox>
-                  ):(
-                    <MessageBox variant="warning">Not Yet Shipped</MessageBox>
+              {order.isShipped ? (
+                <MessageBox variant="success">
+                  Shipped at {order.shippedAt}
+                </MessageBox>
+              ) : (
+                <MessageBox variant="warning">Not Yet Shipped</MessageBox>
               )}
               {order.isDelivered ? (
                 <MessageBox variant="success">
@@ -240,15 +244,26 @@ export default function OrderPage() {
                           src={item.image}
                           alt={item.name}
                           className="img-fluid rounded thumbnail"
-                        ></img>{' '}
+                        ></img>{" "}
                         <Link to={`/product/${item.slug}`}>{item.name}</Link>
                       </Col>
                       <Col md={3}>
                         <span>{item.quantity}</span>
                       </Col>
-                      <Col md={3}><span>&#8377;</span>{item.price}</Col>
+                      <Col md={3}>
+                        <span>&#8377;</span>
+                        {item.price}
+                      </Col>
                     </Row>
-                    <div><button className='btn btn-primary' type='button' onClick={returnHandler}>Return</button></div>
+                    <div>
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={returnHandler}
+                      >
+                        Return
+                      </button>
+                    </div>
                   </ListGroup.Item>
                 ))}
               </ListGroup>
@@ -263,19 +278,28 @@ export default function OrderPage() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Items</Col>
-                    <Col><span>&#8377;</span>{order.itemsPrice.toFixed(2)}</Col>
+                    <Col>
+                      <span>&#8377;</span>
+                      {order.itemsPrice.toFixed(2)}
+                    </Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Shipping</Col>
-                    <Col><span>&#8377;</span>{order.shippingPrice.toFixed(2)}</Col>
+                    <Col>
+                      <span>&#8377;</span>
+                      {order.shippingPrice.toFixed(2)}
+                    </Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col><span>&#8377;</span>{order.taxPrice.toFixed(2)}</Col>
+                    <Col>
+                      <span>&#8377;</span>
+                      {order.taxPrice.toFixed(2)}
+                    </Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -284,14 +308,17 @@ export default function OrderPage() {
                       <strong> Order Total</strong>
                     </Col>
                     <Col>
-                      <strong><span>&#8377;</span>{order.totalPrice.toFixed(2)}</strong>
+                      <strong>
+                        <span>&#8377;</span>
+                        {order.totalPrice.toFixed(2)}
+                      </strong>
                     </Col>
                   </Row>
-                </ListGroup.Item>{' '}
+                </ListGroup.Item>{" "}
                 {loadingPay && <LoadingBox></LoadingBox>}
                 {!order.isPaid && (
                   <ListGroup.Item>
-                    {paymentMethod === 'PayPal' ? (
+                    {paymentMethod === "PayPal" ? (
                       isPending ? (
                         <LoadingBox />
                       ) : isRejected ? (
@@ -333,26 +360,33 @@ export default function OrderPage() {
                     </div>
                   </ListGroup.Item>
                 )}
-                {userInfo!.isAdmin && order.isPaid && order.isPacked && !order.isShipped && (
-                  <ListGroup.Item>
-                    {loadingShipped && <LoadingBox></LoadingBox>}
-                    <div className="d-grid">
-                      <Button type="button" onClick={shipOrderHandler}>
-                        Ship Order
-                      </Button>
-                    </div>
-                  </ListGroup.Item>
-                )}
-                {userInfo!.isAdmin && order.isPaid && order.isPacked && order.isShipped && !order.isDelivered && (
-                  <ListGroup.Item>
-                    {loadingDeliver && <LoadingBox></LoadingBox>}
-                    <div className="d-grid">
-                      <Button type="button" onClick={deliverOrderHandler}>
-                        Deliver Order
-                      </Button>
-                    </div>
-                  </ListGroup.Item>
-                )}
+                {userInfo!.isAdmin &&
+                  order.isPaid &&
+                  order.isPacked &&
+                  !order.isShipped && (
+                    <ListGroup.Item>
+                      {loadingShipped && <LoadingBox></LoadingBox>}
+                      <div className="d-grid">
+                        <Button type="button" onClick={shipOrderHandler}>
+                          Ship Order
+                        </Button>
+                      </div>
+                    </ListGroup.Item>
+                  )}
+                {userInfo!.isAdmin &&
+                  order.isPaid &&
+                  order.isPacked &&
+                  order.isShipped &&
+                  !order.isDelivered && (
+                    <ListGroup.Item>
+                      {loadingDeliver && <LoadingBox></LoadingBox>}
+                      <div className="d-grid">
+                        <Button type="button" onClick={deliverOrderHandler}>
+                          Deliver Order
+                        </Button>
+                      </div>
+                    </ListGroup.Item>
+                  )}
               </ListGroup>
             </Card.Body>
           </Card>
@@ -361,5 +395,5 @@ export default function OrderPage() {
     </div>
   ) : (
     <div>no order data</div>
-  )
+  );
 }
