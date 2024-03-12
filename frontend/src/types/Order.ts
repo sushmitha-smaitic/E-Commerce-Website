@@ -20,4 +20,14 @@ export type Order = {
   shippingPrice: number;
   taxPrice: number;
   totalPrice: number;
+  isPickedUp: boolean;
+  PickedUpAt: string;
+  isReturned: boolean;
+  returnedAt: string;
+};
+
+export type ReturnOrder = {
+  returnReason: string;
+  //returnAddress: shippingAddress;
+  returnMethod: string;
 };

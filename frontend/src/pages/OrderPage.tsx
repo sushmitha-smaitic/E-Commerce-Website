@@ -27,6 +27,8 @@ import {
   useGetStripePublishableKeyQuery,
   usePackedOrderMutation,
   usePayOrderMutation,
+  //usePickedUpOrderMutation,
+  //useReturnOrderMutation,
   useShippedOrderMutation,
 } from "../hooks/orderHooks";
 import { ApiError } from "../types/ApiError";
@@ -57,6 +59,12 @@ export default function OrderPage() {
 
   const { mutateAsync: deliverOrder, isPending: loadingDeliver } =
     useDeliverOrderMutation();
+
+  // const { mutateAsync: initiateReturn, isPending: loadingReturn } =
+  //   useReturnOrderMutation();
+
+  // const { mutateAsync: pickOrder, isPending: loadingPickup } =
+  //   usePickedUpOrderMutation();
 
   const navigate = useNavigate();
   async function returnHandler() {
@@ -98,6 +106,26 @@ export default function OrderPage() {
     refetch();
     toast.success("Order is paid");
   };
+
+  // async function initiateReturnHandler() {
+  //   try {
+  //     await initiateReturn(orderId!);
+  //     refetch();
+  //     toast.success("Return is initiated");
+  //   } catch (err) {
+  //     toast.error(getError(err as ApiError));
+  //   }
+  // }
+
+  // async function pickUpOrderHandler() {
+  //   try {
+  //     await pickOrder(orderId!);
+  //     refetch();
+  //     toast.success("Order is Picked Up");
+  //   } catch (err) {
+  //     toast.error(getError(err as ApiError));
+  //   }
+  // }
   const paypalbuttonTransactionProps: PayPalButtonsComponentProps = {
     style: { layout: "vertical" },
     async createOrder(data, actions) {
@@ -214,6 +242,18 @@ export default function OrderPage() {
               ) : (
                 <MessageBox variant="warning">Not Delivered</MessageBox>
               )}
+              {/* {order.isDelivered && order.isReturned ? (
+                <MessageBox variant="success">Return Initiated</MessageBox>
+              ) : (
+                <MessageBox variant="warning">Return Not Accepted</MessageBox>
+              )}
+              {order.isPickedUp ? (
+                <MessageBox variant="success">
+                  Picked Up at {order.PickedUpAt}
+                </MessageBox>
+              ) : (
+                <MessageBox variant="warning">Not Yet Picked Up</MessageBox>
+              )} */}
             </Card.Body>
           </Card>
           <Card className="mb-3">
@@ -244,7 +284,8 @@ export default function OrderPage() {
                           src={item.image}
                           alt={item.name}
                           className="img-fluid rounded thumbnail"
-                        ></img>{" "}
+                        ></img>
+                        <br />
                         <Link to={`/product/${item.slug}`}>{item.name}</Link>
                       </Col>
                       <Col md={3}>
@@ -256,13 +297,23 @@ export default function OrderPage() {
                       </Col>
                     </Row>
                     <div>
-                      <button
-                        className="btn btn-primary"
+                      <Button
+                        id="ret-btn"
+                        className="btn btn-primary mt-3"
                         type="button"
                         onClick={returnHandler}
+                        hidden={
+                          order.isDelivered == false ||
+                          userInfo?.isAdmin == true
+                        }
+                        disabled={
+                          (Date.now() - Date.parse(order.deliveredAt)) /
+                            (1000 * 60 * 60 * 24) >
+                          7
+                        }
                       >
                         Return
-                      </button>
+                      </Button>
                     </div>
                   </ListGroup.Item>
                 ))}
@@ -390,6 +441,35 @@ export default function OrderPage() {
               </ListGroup>
             </Card.Body>
           </Card>
+          {userInfo!.isAdmin &&
+            order.isPacked &&
+            order.isShipped &&
+            order.isDelivered &&
+            !order.isReturned && (
+              <ListGroup.Item>
+                {/* {loadingReturn && <LoadingBox></LoadingBox>}
+                <div className="d-grid">
+                  <Button type="button" onClick={initiateReturnHandler}>
+                    Initiate Return
+                  </Button>
+                </div> */}
+              </ListGroup.Item>
+            )}
+          {userInfo!.isAdmin &&
+            order.isPacked &&
+            order.isShipped &&
+            order.isDelivered &&
+            order.isReturned &&
+            !order.isPickedUp && (
+              <ListGroup.Item>
+                {/* {loadingPickup && <LoadingBox></LoadingBox>}
+                <div className="d-grid">
+                  <Button type="button" onClick={pickUpOrderHandler}>
+                    PickUp Return
+                  </Button>
+                </div> */}
+              </ListGroup.Item>
+            )}
         </Col>
       </Row>
     </div>

@@ -111,6 +111,26 @@ export const usePackedOrderMutation = () =>
       ).data,
   });
 
+export const useReturnOrderMutation = () =>
+  useMutation({
+    mutationFn: async (orderId: string) =>
+      (
+        await apiClient.put<{ message: string; order: Order }>(
+          `api/orders/${orderId}/return`
+        )
+      ).data,
+  });
+
+export const usePickedUpOrderMutation = () =>
+  useMutation({
+    mutationFn: async (orderId: string) =>
+      (
+        await apiClient.put<{ message: string; order: Order }>(
+          `api/orders/${orderId}/return/pickup`
+        )
+      ).data,
+  });
+
 export const useGetStripePublishableKeyQuery = () =>
   useQuery({
     queryKey: ["stripe-publishable-key"],

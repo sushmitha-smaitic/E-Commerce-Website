@@ -249,3 +249,26 @@ orderRouter.delete("/:id", isAuth, isAdmin, async (req, res) => {
     res.status(404).send("Order Not Found.");
   }
 });
+
+// mark as PickedUp return order
+orderRouter.put(
+  "/:id/return/pickup",
+  isAuth,
+  isAdmin,
+  asyncHandler(async (req: Request, res: Response) => {
+    const order = await OrderModel.findById(req.params.id);
+
+    if (order) {
+      order.isPickedUp = true;
+      order.PickedUpAt = new Date(Date.now());
+      const updatedOrder = await order.save();
+
+      res.status(200).send({
+        order: updatedOrder,
+        message: "Order is PickedUp",
+      });
+    } else {
+      res.status(404).json({ message: "Order Not Found" });
+    }
+  })
+);

@@ -166,7 +166,7 @@ export default function CreateProductPage() {
           </ListGroup>
         </Form.Group>
         <Form.Group className="mb-3" controlId="additionalImageFile">
-          <Form.Label>Upload Aditional Image</Form.Label>
+          <Form.Label>Upload Additional Image</Form.Label>
 
           <input
             type="file"

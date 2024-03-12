@@ -115,6 +115,12 @@ export class Order {
 
   @prop()
   public shippedAt!: Date;
+
+  @prop({ required: true, default: false })
+  public isPickedUp!: boolean;
+
+  @prop()
+  public PickedUpAt!: Date;
 }
 
 export const OrderModel = getModelForClass(Order);
