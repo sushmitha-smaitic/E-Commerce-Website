@@ -250,6 +250,36 @@ orderRouter.delete("/:id", isAuth, isAdmin, async (req, res) => {
   }
 });
 
+// mark as returned
+orderRouter.put(
+  "/:id/return",
+  isAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const orderId = req.params.id;
+
+    // Find the order by ID
+    const order = await OrderModel.findById(orderId);
+
+    if (order) {
+      // Update order status to indicate it has been returned
+      order.isReturned = true;
+      order.returnedAt = new Date(); // Set the return date
+
+      // Save the updated order
+      const updatedOrder = await order.save();
+
+      // Send response
+      res.status(200).send({
+        order: updatedOrder,
+        message: "Order has been returned successfully",
+      });
+    } else {
+      // If order not found, send 404 response
+      res.status(404).json({ message: "Order not found" });
+    }
+  })
+);
+
 // mark as PickedUp return order
 orderRouter.put(
   "/:id/return/pickup",

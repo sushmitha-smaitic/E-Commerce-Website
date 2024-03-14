@@ -117,6 +117,12 @@ export class Order {
   public shippedAt!: Date;
 
   @prop({ required: true, default: false })
+  public isReturned!: boolean;
+
+  @prop()
+  public returnedAt!: Date;
+
+  @prop({ required: true, default: false })
   public isPickedUp!: boolean;
 
   @prop()

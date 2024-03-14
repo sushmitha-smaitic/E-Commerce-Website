@@ -367,7 +367,7 @@ export default function OrderPage() {
                   </Row>
                 </ListGroup.Item>{" "}
                 {loadingPay && <LoadingBox></LoadingBox>}
-                {!order.isPaid && (
+                {!order.isPaid && order.paymentMethod !== "CashOnDelivery" && (
                   <ListGroup.Item>
                     {paymentMethod === "PayPal" ? (
                       isPending ? (
@@ -401,29 +401,143 @@ export default function OrderPage() {
                     )}
                   </ListGroup.Item>
                 )}
-                {userInfo!.isAdmin && order.isPaid && !order.isPacked && (
+                {userInfo!.isAdmin && (
                   <ListGroup.Item>
-                    {loadingPacked && <LoadingBox></LoadingBox>}
-                    <div className="d-grid">
-                      <Button type="button" onClick={packOrderHandler}>
-                        Pack Order
-                      </Button>
-                    </div>
+                    {order.paymentMethod === "CashOnDelivery" &&
+                      !order.isPaid &&
+                      !order.isPacked && (
+                        <>
+                          {loadingPacked && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={packOrderHandler}>
+                              Pack Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    {(order.paymentMethod === "PayPal" ||
+                      order.paymentMethod === "Stripe") &&
+                      order.isPaid &&
+                      !order.isPacked && (
+                        <>
+                          {loadingPacked && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={packOrderHandler}>
+                              Pack Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
                   </ListGroup.Item>
                 )}
-                {userInfo!.isAdmin &&
-                  order.isPaid &&
-                  order.isPacked &&
-                  !order.isShipped && (
+                {/* {userInfo!.isAdmin &&
+                  !order.isPaid &&
+                  order.paymentMethod === "CashOnDelivery" &&
+                  !order.isPacked && (
                     <ListGroup.Item>
-                      {loadingShipped && <LoadingBox></LoadingBox>}
+                      {loadingPacked && <LoadingBox></LoadingBox>}
                       <div className="d-grid">
-                        <Button type="button" onClick={shipOrderHandler}>
-                          Ship Order
+                        <Button type="button" onClick={packOrderHandler}>
+                          Pack Order
                         </Button>
                       </div>
                     </ListGroup.Item>
-                  )}
+                  )} */}
+                {userInfo!.isAdmin && (
+                  <ListGroup.Item>
+                    {order.paymentMethod === "CashOnDelivery" &&
+                      !order.isPaid &&
+                      order.isPacked &&
+                      !order.isShipped && (
+                        <>
+                          {loadingShipped && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={shipOrderHandler}>
+                              Ship Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    {(order.paymentMethod === "PayPal" ||
+                      order.paymentMethod === "Stripe") &&
+                      order.isPaid &&
+                      order.isPacked &&
+                      !order.isShipped && (
+                        <>
+                          {loadingShipped && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={shipOrderHandler}>
+                              Ship Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                  </ListGroup.Item>
+                )}
+                {userInfo!.isAdmin && (
+                  <ListGroup.Item>
+                    {order.paymentMethod === "CashOnDelivery" &&
+                      !order.isPaid &&
+                      order.isPacked &&
+                      order.isShipped &&
+                      !order.isDelivered && (
+                        <>
+                          {loadingDeliver && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={deliverOrderHandler}>
+                              Deliver Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    {(order.paymentMethod === "PayPal" ||
+                      order.paymentMethod === "Stripe") &&
+                      order.isPaid &&
+                      order.isPacked &&
+                      order.isShipped &&
+                      !order.isDelivered && (
+                        <>
+                          {loadingPacked && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={packOrderHandler}>
+                              Deliver Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                  </ListGroup.Item>
+                )}
+                {/* {userInfo!.isAdmin && (
+                  <ListGroup.Item>
+                    {order.paymentMethod === "CashOnDelivery" &&
+                      !order.isPaid &&
+                      order.isPacked && 
+                      !order.isShipped &&(
+                        <>
+                          {loadingPacked && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={shipOrderHandler}>
+                              Ship Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    {(order.paymentMethod === "PayPal" ||
+                      order.paymentMethod === "Stripe") &&
+                      order.isPaid &&
+                      order.isPacked && 
+                      !order.isShipped &&(
+                        <>
+                          {loadingPacked && <LoadingBox></LoadingBox>}
+                          <div className="d-grid">
+                            <Button type="button" onClick={shipOrderHandler}>
+                              Ship Order
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                  </ListGroup.Item>
+                )}
                 {userInfo!.isAdmin &&
                   order.isPaid &&
                   order.isPacked &&
@@ -437,7 +551,7 @@ export default function OrderPage() {
                         </Button>
                       </div>
                     </ListGroup.Item>
-                  )}
+                  )} */}
               </ListGroup>
             </Card.Body>
           </Card>

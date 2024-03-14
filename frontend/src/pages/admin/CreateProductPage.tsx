@@ -62,7 +62,8 @@ export default function CreateProductPage() {
   const { mutateAsync: uploadProduct, isPending: loadingUpload } =
     useUploadProductMutation();
 
-  const { data: categories } = useGetCategoriesQuery();
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery();
 
   const uploadFileHandler = async (
     e: React.FormEvent<HTMLInputElement>,
@@ -89,21 +90,6 @@ export default function CreateProductPage() {
   const deleteFileHandler = async (fileName: string) => {
     setImages(images.filter((x) => x !== fileName));
     toast.success("Image removed successfully. click Update to apply it");
-  };
-
-  const renderCategoryOptions = () => {
-    return (
-      categories &&
-      categories.map((category: string) => (
-        <option key={category} value={category}>
-          {category}
-        </option>
-      ))
-    );
-  };
-
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLFormElement>) => {
-    setSelectedCategory(event.target.value);
   };
 
   return (
@@ -175,55 +161,30 @@ export default function CreateProductPage() {
 
           {loadingUpload && <LoadingBox></LoadingBox>}
         </Form.Group>
-        <Form.Group className="mb-3" controlId="category">
-          <Form.Label>Category</Form.Label>
-          <Form.Control
-            as="select"
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            required
-          >
-            <option value="">Select a category</option>
-            {renderCategoryOptions()}
-          </Form.Control>
-
-          {/* <div>
-            <select
-              id="category"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
-              required
-            >
-              <option value="">Select a category</option>
-              {renderCategoryOptions()}
-            </select>
-          </div> */}
-        </Form.Group>
-        {/* <div className="mb-3">
-          <label htmlFor="category">Select a category:</label>
-          <select
-            id="category"
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            required
-          >
-            <option value="">Select a category</option>
-            {renderCategoryOptions()}
-          </select>
-        </div> */}
-        {/* Display the selected category in a text box */}
         <div>
           <label>Selected category:</label>
           <input type="text" value={selectedCategory} readOnly />
         </div>
-        {/* <Form.Group className="mb-3" controlId="category">
+        <Form.Group className="mb-3" controlId="category">
           <Form.Label>Category</Form.Label>
-          <Form.Control
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+          <Form.Select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             required
-          />
-        </Form.Group> */}
+          >
+            <option value="">Select a category</option>
+            {categoriesLoading ? (
+              <option disabled>Loading categories...</option>
+            ) : (
+              categories &&
+              categories.map((category: string) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))
+            )}
+          </Form.Select>
+        </Form.Group>
         <Form.Group className="mb-3" controlId="brand">
           <Form.Label>Brand</Form.Label>
           <Form.Control

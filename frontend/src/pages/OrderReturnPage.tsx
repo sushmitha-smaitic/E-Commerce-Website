@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Store } from "../Store";
 import LoadingBox from "../components/LoadingBox";
 import MessageBox from "../components/MessageBox";
@@ -11,6 +11,7 @@ import { getError } from "../utils";
 
 const OrderReturnPage = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const { state, dispatch } = useContext(Store);
   //const navigate = useNavigate();
   const { id: orderId } = params;
@@ -32,6 +33,9 @@ const OrderReturnPage = () => {
     localStorage.setItem("returnReason", ReturnReason);
     dispatch({ type: "SAVE_RETURN_METHOD", payload: returnMethod });
     localStorage.setItem("returnMethod", ReturnMethod);
+    if (ReturnMethod === "Replace Item") {
+      navigate(`/order/${orderId}/return/replace`);
+    }
   };
 
   return isLoading ? (
