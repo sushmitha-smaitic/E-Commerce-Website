@@ -497,9 +497,9 @@ export default function OrderPage() {
                       order.isShipped &&
                       !order.isDelivered && (
                         <>
-                          {loadingPacked && <LoadingBox></LoadingBox>}
+                          {loadingDeliver && <LoadingBox></LoadingBox>}
                           <div className="d-grid">
-                            <Button type="button" onClick={packOrderHandler}>
+                            <Button type="button" onClick={deliverOrderHandler}>
                               Deliver Order
                             </Button>
                           </div>

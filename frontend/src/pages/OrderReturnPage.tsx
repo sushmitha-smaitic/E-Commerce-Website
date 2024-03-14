@@ -35,6 +35,8 @@ const OrderReturnPage = () => {
     localStorage.setItem("returnMethod", ReturnMethod);
     if (ReturnMethod === "Replace Item") {
       navigate(`/order/${orderId}/return/replace`);
+    } else {
+      navigate(`/order/${orderId}/return/refund`);
     }
   };
 
